@@ -17,6 +17,8 @@ This has been pulled together to collate a bunch of older repos.
     - was the `webdriverwebinars` repo
     - https://github.com/eviltester/webdriverwebinars
 
+- automationAbstractions
+
 - selenium-driver-manager-example
     - related to https://github.com/eviltester/selenium-driver-manager
     - https://github.com/eviltester/selenium-driver-manager-example
