@@ -18,6 +18,7 @@ This has been pulled together to collate a bunch of older repos.
     - https://github.com/eviltester/webdriverwebinars
 
 - automationAbstractions
+    - https://github.com/eviltester/automationabstractions
 
 - selenium-driver-manager-example
     - related to https://github.com/eviltester/selenium-driver-manager
@@ -31,6 +32,7 @@ This has been pulled together to collate a bunch of older repos.
     - https://github.com/eviltester/webdriver4examples
 - synchronisationabstractions
     - https://github.com/eviltester/synchronisationabstractions
+    - this was obviously a work in progress and was not complete - patched to compile
 - Model based
     - https://github.com/eviltester/modelbased
 - driver examples
