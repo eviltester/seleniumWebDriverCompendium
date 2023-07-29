@@ -4,11 +4,19 @@ A miscellany of Selenium WebDriver Content.
 
 This has been pulled together to collate a bunch of older repos.
 
+- [automateGoogleSearch](https://github.com/eviltester/seleniumWebDriverCompendium/tree/main/automateGoogleSearch)
+    - was at github.com/eviltester/automateGoogleSearch
+    - this is the code for the Let's Automate Google Search videos
+        - https://www.youtube.com/playlist?list=PLrM2ELpRbbu7c9oZKG8IHNX41Yi20p4an
+    - updated on 20230729 to still use Selenium 3 but to handle changes to Google UI
+    - Remember - automating the Google UI is not a good My First Test exercise... and this code shows why.
+
+
+
 - webinars
     - was the `webdriverwebinars` repo
     - https://github.com/eviltester/webdriverwebinars
-- automateGoogleSearch
-    - https://github.com/eviltester/automateGoogleSearch
+
 - selenium-driver-manager-example
     - related to https://github.com/eviltester/selenium-driver-manager
     - https://github.com/eviltester/selenium-driver-manager-example
