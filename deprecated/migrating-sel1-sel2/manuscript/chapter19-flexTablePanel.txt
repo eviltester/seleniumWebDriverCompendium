@@ -1,0 +1,104 @@
+#  19 A Worked Example: FlexTablePanel 
+
+##  19.1 What we need to do 
+
+FlexTablePanel offers a very simple Page Object to migrate. We need to change the call to the constructor in SideMenu.java 
+
+There is very little new to learn here, although we do get a chance to use findElements. 
+
+##  19.2 What we need to know 
+
+  * WebElement .click 
+  * how to use findElements as a replacement to getXpathCount 
+
+##  19.3 Changes to make 
+
+  * Start with SideMenu.java and pass in driver 
+  * in FlexTablePanel.java 
+
+    * selenium.getXpathCount becomes...
+
+      * driver.findElements(By.xpath(...)).size() 
+      * A sideffect of this means we now have a count by CSS locator (and all the other By. Operators as well) 
+
+    * amend getTitle 
+    * replace .click with findElement(...).click 
+
+###  19.3.1 SideMenu.java 
+
+Change the constructor call to FlexTablePanel to use WebDriver. 
+    
+~~~~~~~~    
+    public FlexTablePanel selectTablesFlexTable() {
+      clickSubMenuItem("Flex Table");
+      return new FlexTablePanel(selenium); 
+    }
+~~~~~~~~    
+
+becomes 
+    
+~~~~~~~~    
+    public FlexTablePanel selectTablesFlexTable() {
+      clickSubMenuItem("Flex Table");
+      return new FlexTablePanel(driver); 
+    }
+~~~~~~~~    
+
+By starting with SideMenu.java my IDE can do a lot of the work for me and I can see that I'm pushing WebDriver down into lower levels of the abstraction layer 
+
+###  19.3.2 FlexTablePanel.java 
+
+Change the FlexTablePanel constructor so it uses WebDriver 
+    
+~~~~~~~~    
+    private WebDriver driver;
+...
+    public FlexTablePanel(WebDriver driver) {
+      this.driver = driver;
+    }
+~~~~~~~~
+
+The isPageTitleCorrect method we migrate as before: 
+
+~~~~~~~~    
+    public boolean isPageTitleCorrect() {
+      return driver.getTitle().endsWith("Flex Table");
+    }
+~~~~~~~~
+    
+
+getNumberOfRows requires us to use new knowledge for the .getXpathCount conversion 
+
+WebDriver can return a collection of WebElement(s) by using findElements and with collections we can get their size so: 
+    
+~~~~~~~~    
+return (selenium.getXpathCount(
+          "//table[@id='gwt-debug-cwFlexTable']/tbody/tr").intValue() -1);
+~~~~~~~~    
+
+becomes 
+    
+~~~~~~~~    
+  	public int getNumberOfRows() {
+  		String rowsXpath = "//table[@id='gwt-debug-cwFlexTable']/tbody/tr";
+  		return (driver.findElements(By.xpath(rowsXpath))).size()-1;
+  	}
+~~~~~~~~    
+
+The addRow and removeRow methods use the normal .findElement(By...).click() approach: 
+    
+~~~~~~~~    
+  public void addRow(){
+    String addButton = 
+        "//td[@id='gwt-debug-cwFlexTable-0-1']//button[.='Add a row']";
+    driver.findElement(By.xpath(addButton)).click();
+  }
+  public void removeRow(){
+    String removeButton = 
+      "//td[@id='gwt-debug-cwFlexTable-0-1']//button[.='Remove a row']";
+    driver.findElement(By.xpath(removeButton)).click();
+  }
+~~~~~~~~    
+    
+
+code checked in as revision 18 

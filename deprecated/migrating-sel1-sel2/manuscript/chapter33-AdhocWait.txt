@@ -1,0 +1,219 @@
+#  33 Adhoc Wait Removed in Selenium 2 Release Candidate 2 
+    
+~~~~~~~~    
+    new Wait("Page Did Not Load"){
+      @Override
+      public boolean until() {
+    	return true;
+      }
+    };
+~~~~~~~~    
+
+In this Wait, a wait loop is triggered by the constructor. 
+
+or 
+    
+~~~~~~~~    
+    new Wait(){
+      @Override
+      public boolean until() {
+    	return true;
+      }
+    }.wait("Page Did Not Load");
+~~~~~~~~    
+
+In this loop the wait loop is triggered by calling the wait method. 
+
+Both examples above immediately return true and do not wait, but show the structure of the adhoc wait. 
+
+There are 2 Wait classes you could import in the Selenium codebase 
+
+  * com.thoughtworks.selenium
+
+    * use this one 
+
+  * org.openqa.selenium.support.ui
+
+    * this is the underlying Wait class for the non-adhoc wait, best not to use this directly 
+
+##  33.1 com.thoughtworks.selenium 
+
+There is one mandatory part to using the Wait: 
+
+  * override the until method 
+
+The wait object works by setting up a loop where it calls the until method and: 
+
+  * if it returns true it ends the wait loop. 
+  * if it returns false then 
+
+    * it pauses for an interval period (Default of 500 milliseconds) 
+    * then repeats the call to the until method 
+
+  * the wait loop times out if it hasn't had a true result within the timeout period (Default of 30 seconds)
+
+    * throws a WaitTimedOutException using the message passed in when the .wait method was called 
+
+You can start the wait by passing in a String to the constructor, in which case the Wait will use the default timeout values. 
+
+Or you can start the wait by calling the the .wait method on the Wait object 
+
+~~~~~~~~
+  * .wait(String messageOnTimeout) 
+  * .wait(String messageOnTimeout, long TimeoutInMilliseconds) 
+  * .wait(String messageOnTimeout, 
+         long TimeoutInMilliseconds, long intervalInMilliseconds) 
+~~~~~~~~
+
+The timeoutInMilliseconds parameter controls how long the wait lasts if until never returns true. 
+
+The intervalInMilliseconds parameter controls the length of time before calling the until method again. 
+
+It is very easy to pick the wrong method on code completion and use one of the wait methods on Object instead of the Wait object. If you do this then you engage the Thread.sleep mechanisms in Java rather than a conditional wait, so your end wait condition would not be used, instead the Thread processing would pause for the timeout period and you have to trap an InterruptedException (see http://download.oracle.com/javase/1.4.2/docs/api/java/lang/Object.html for more details). Try not to do this, but if your IDE tells you to catch an InterruptedException then it means you have chosen the wrong form of the .wait. 
+
+##  33.2 Examples 
+
+In the following examples the Wait waits until it has counted up to 10. 
+
+Typically you would use WebDriver commands in the Wait, but this shows it can be used for general purpose work if required. 
+
+You may have to wrap WebDriver commands in a try catch block to prevent the loop terminating early. e.g. if you are waiting for an element to appear and use a driver.findElement then you would have to catch any exceptions otherwise the Wait will terminate without having had a chance to find the element. 
+
+  * Wait triggered by the constructor, uses the default timeouts, 
+    
+~~~~~~~~    
+    new Wait("Page Did Not Load"){
+    			int count=0;
+    			@Override
+    			public boolean until(){
+    				if(count==10)
+    					return true;
+    				
+    				count++;
+    				return false;
+    			}			
+    		};
+~~~~~~~~    
+
+  * Wait triggered by the .wait method, changed timeouts timeouts to wait for max of 20 seconds and 1 second between checks. Note the use of "l" (lower case L) after the number to specifically declare the literal as a long, 
+    
+~~~~~~~~    
+    new Wait(){
+    			int count=0;
+    			@Override
+    			public boolean until(){
+    				if(count==10)
+    					return true;
+    				
+    				count++;
+    				return false;
+    			}			
+    		}.wait("Page Did Not Load",20000l,1000l);
+~~~~~~~~    
+
+  * Bad Example: This wait will wait twice because of the call in the constructor, and the subsequent call to the .wait method, 
+    
+~~~~~~~~    
+    new Wait("Page Did Not Load"){
+    			int count=0;
+    			@Override
+    			public boolean until(){
+    				if(count==10)
+    					return true;
+    				
+    				count++;
+    				return false;
+    			}			
+    		}.wait("until done");
+~~~~~~~~    
+
+##  33.3 WebDriverWait 
+
+WebDriverWait takes an object which implements the ExpectedCondition interface as a parameter. 
+
+A WebDriverWait 'swallows' NotFoundExceptions. 
+
+To Implement the ExpectedCondition interface have to override an 'apply' method. Which performs a similar job to the 'until' method in the previous Wait. 
+
+Apply can return an Object or Boolean. If it returns an Object then null is treated as false and not null treated as true and ends the wait loop. 
+
+  * ExpectedCondition implements apply 
+  * Apply returns null or Boolean 
+  * wait.until stops when !null or true 
+
+###  33.3.1 WebDriverWait as an Adhoc Wait 
+    
+~~~~~~~~    
+new WebDriverWait(driver, 10){}
+.until(new ExpectedCondition(){
+  @Override
+  public Boolean apply(WebDriver driver) {
+             return driver.getTitle().startsWith(
+                  TITLE_OF_PAGE_STARTS_WITH_THIS);
+        }});
+~~~~~~~~
+    
+
+Here we have created a new WebDriverWait, which times out in 10 seconds if the Expected Condition is not met. 
+
+The ExpectedCondition is defined as an anonymous inner class where we have overriden the apply method to implement the check for the expected condition. 
+
+You can use it as an adhoc wait to create simple checks using the driver. 
+
+If you want to use anything more complicated then you have to make an architectural decision and build the wait into your abstraction layer. 
+
+###  33.3.2 WebDriverWait as an Architectural Decision as a local support class 
+
+We can choose to make the wait local to the page and create the classess within the page object itself. But I'm not going to cover that here. 
+
+See blog post for this... 
+
+###  33.3.3 WebDriverWait as an Architectural Decision to build an abstraction layer 
+    
+~~~~~~~~    
+    WebDriverWait wait = new WebDriverWait(driver, 20);
+    MyExpectedCondition conditionMet = new MyExpectedCondition();
+    wait.until(conditionMet);
+~~~~~~~~    
+
+An example ExpectedCondition, which implements the 'count' checking as shown in the previous Wait would look like: 
+    
+~~~~~~~~    
+    import org.openqa.selenium.WebDriver;
+    import org.openqa.selenium.support.ui.ExpectedCondition;
+
+    public class MyExpectedCondition implements ExpectedCondition{
+
+    	int count =0;
+    	
+    	@Override
+    	public Boolean apply(WebDriver driver) {
+
+    		if(count==10)
+    			return true;
+    		
+    		count++;
+    		return false;
+    	}
+
+    }
+~~~~~~~~    
+
+###  33.3.4 Advantages to WebDriverWait 
+
+  * Because WebDriverWait 'swallows' NotFoundExceptions, when you use driver commands in the apply method you do not need a try catch block. 
+  * The calling code looks a lot cleaner 
+  * You have a cleaner Object hierarchy and can reuse the ExpectedConditions 
+  * Your waits can return Objects
+
+    * so I could return a WebElement in my wait e.g. wait.until(condition).click() 
+
+###  33.3.5 Disadvantages to WebDriverWait 
+
+  * You need to write more code 
+  * You need to think a little more about your abstraction layer (although this is probably a positive) 
+
+##  33.4 Summary 
+
+  * Wait is good for adhoc waits, when building tests or experimenting with automation 
+  * WebDriverWait is better for building robust abstraction layers and wrapping WebDriver calls 

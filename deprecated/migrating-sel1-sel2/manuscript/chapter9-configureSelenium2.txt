@@ -1,0 +1,35 @@
+#  9 A Worked Example: Configure Selenium 2.0 
+
+I downloaded the selenium sources jar from the Selenium site they are contained in the Selenium Client Drivers .zip download. 
+
+The best documentation for Selenium 2 is the source code. 
+
+So I took selenium-java-2.0b3-srcs.jar from the zip and added it to the libs folder. 
+
+This way my codebase has fewer libs in it to manage because the main Selenium jar I use is the all-in-one jar it just doesn't have the source-in-it 
+
+This is checked in as Revision 5 
+
+##  9.1 Associate Selenium Source Code 
+
+The selenium source is included in the checkout in the selenium-java-2.0b3-srcs.jar 
+
+Although we are using the all-in-one build for the server, the `...srcs.jar` is included in the 'other' download for Selenium. But I have extracted it into the repo to make things easy. 
+
+Then I have to link the source code in the workshop to the Selenium source code. 
+
+In IDE link the workshop code to Selenium code in `libs\selenium-java-2.0b3-srcs.jar`
+
+##  9.2 Viewing the full Selenium 2.0 Source Code 
+
+If you want to you can checkout the full Selenium source code. 
+
+You could import the Selenium java code into Eclipse to make it easy to browse the Selenium code. 
+
+If you want you could do an 
+
+`> Svn checkout http://selenium.googlecode.com/svn/trunk/java/`
+
+Or browse the Selenium 2.0 code online 
+
+http://code.google.com/p/selenium/source/browse/#svn/trunk 

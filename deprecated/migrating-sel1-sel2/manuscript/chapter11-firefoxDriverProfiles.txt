@@ -1,0 +1,114 @@
+#  11 A Worked Example: Firefox Driver Profiles 
+
+Each driver has different capabilities and it is worth looking through the sourcecode to see what Selenium 2.0 offers for your browser. 
+
+When we look at the Firefox code in Selenium 2.0 we can see a FirefoxProfile object. This can be used to configure Firefox in our tests. 
+
+[http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/firefox/FirefoxProfile.java](http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/firefox/FirefoxProfile.java)
+
+What can we do with the Firefox Driver Profile? 
+
+We can use the FirefoxProfile to: 
+
+  * change the preferences, 
+  * add extensions, 
+  * change the proxy 
+
+I'm going to cover its basic functionality here because we will use it to help us with our migration. 
+
+During the migration we will have tests that fail, and we need to have the ability to debug those tests during the test execution. Firebug would be a tremendous help for this, but when we start Firefox in our tests we lose our normal plugins and configurations. Hence the profile. So I can pass a profile in which defines loading of Firebug. 
+
+Firebug 1.6.2 (for Firefox 3.6) and 1.7.1 (for Firefox 4) are already in the sourcecode base that you have checked out in the /firefoxExtensions folder. 
+
+I simply add the extension using the .addExtension method. 
+
+I also have to set a preference which Firebug normally sets on first execution, without the .setPreference I will see a dialog for "This is the first time you have used Firebug..." etc. etc. and that will interfere with the tests. 
+
+See also [http://www.eviltester.com/index.php/2011/03/23/selenium-2-makes-automation-debugging-easier/](http://www.eviltester.com/index.php/2011/03/23/selenium-2-makes-automation-debugging-easier/)
+
+~~~~~~~~    
+        String extensionPath = "./firefoxExtensions/firebug-1.7.1.xpi";
+        FirefoxProfile profile = new FirefoxProfile();
+    	profile.setPreference("extensions.firebug.currentVersion", "1.7.1");
+    	try {
+    		profile.addExtension(new File(extensionPath));
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    	}
+~~~~~~~~
+
+Becomes:
+
+~~~~~~~~
+    	WebDriver driver = new FirefoxDriver(profile);
+    	selenium = new WebDriverBackedSelenium(driver,apphost);
+~~~~~~~~
+
+For an extended example on how to configure Firefox through a proxy you can read a blog post on eviltester.com 
+
+[http://www.eviltester.com/index.php/2011/03/23/selenium-2-makes-automation-debugging-easier](http://www.eviltester.com/index.php/2011/03/23/selenium-2-makes-automation-debugging-easier)
+
+Where I simply added proxy setup code e.g. 
+
+~~~~~~~~    
+    Proxy localhostProxy = new Proxy();
+    localhostProxy.setProxyType(Proxy.ProxyType.MANUAL);
+    localhostProxy.setHttpProxy("localhost:8081");
+    profile.setProxyPreferences(localhostProxy);
+~~~~~~~~
+
+
+This is checked in as Revision 7 
+
+##  11.1 To support Firefox 4 and Firefox 3.6 
+
+By the time everyone reads this, most of you will have upgraded to Firefox 4, but Revision 9 introduces some changes to support the use of other of versions of firebug if necessary: 
+
+  * firebug-1.7.1.xpi and firebug-1.6.2.xpi are in the firefoxExtensions folder 
+  * the code uses firebug-1.7.1 as the default 
+  * If you want/must use a different version of Firefox, which supports a different version of firebug (e.g. Firefox 3.6 uses Firebug 1.6.2) then you will have to create a firefox.properties file with the property firebugversion =  you want to use
+
+    * firebugversion=1.6.2 
+
+  * This file is not in subversion therefore if you add it to your ignore list then if you have to revert the codebase it will remain untouched and if you update it will not be affected
+
+    * svn propset svn:ignore firefox.properties . 
+
+You can use this if the version of Firebug is not compatible with your version of Firefox, or you want to use a more recent version of Firebug 
+
+To make these changes I amended the code above to read: 
+    
+~~~~~~~~    
+String firebugVersion = getFirebugVersion();
+String extensionPath = "./firefoxExtensions/firebug-" + 
+            firebugVersion + ".xpi";
+FirefoxProfile profile = new FirefoxProfile();
+profile.setPreference("extensions.firebug.currentVersion", 
+        firebugVersion);
+~~~~~~~~    
+
+and the getFirebugVersion method reads: 
+
+~~~~~~~~    
+    	private static String getFirebugVersion() {
+    		Properties props;
+    		props = new Properties();
+    		String propertyFile = "firefox.properties";
+    		
+    		try {
+    			props.load(new FileInputStream("./" + propertyFile));
+    		} catch (FileNotFoundException e) {
+    			System.out.println("No Properties file found");
+    			e.printStackTrace();
+    		} catch (IOException e) {
+    			System.out.println("Error loading properties file");
+    			e.printStackTrace();
+    		}
+    		 
+    		return props.getProperty("firebugversion","1.7.1");
+    	}
+~~~~~~~~    
+
+You would not normally have to do this in a migration but I have to add it to make this text and supporting code support as many configurations as I can. 
+
+This is checked in as Revision 8 

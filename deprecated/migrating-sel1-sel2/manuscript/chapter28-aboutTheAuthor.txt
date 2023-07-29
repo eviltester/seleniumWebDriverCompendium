@@ -1,0 +1,9 @@
+#  28 About The Author 
+
+Alan Richardson
+
+  * www.eviltester.com 
+  * www.compendiumdev.co.uk 
+  * SeleniumSimplified.com
+
+    * www.compendiumdev.co.uk/selenium 

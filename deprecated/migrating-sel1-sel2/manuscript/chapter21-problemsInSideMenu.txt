@@ -1,0 +1,105 @@
+#  21 A Worked Example: Problems in SideMenu 
+
+##  21.1 What we need to do 
+
+The problem we have to fix is a cross browser issue. And only for our automation. We somehow have to wait before trying to click on the subMenu item so that we only click on the subMenu item when the item will respond to clicks. 
+
+A number of options present themselves: 
+
+1. wait until the item is clickable in sideMenu
+    * this is hard to determine as the element is present, etc. 
+2. add a thread.sleep(...)
+    * an ugly solution to any synchronisation problem and would slow down our tests unnecessarily on browsers where no problem exists 
+3. add a synchronisation point in MenuHeading.java closeOpen
+    * we could only count the menu as open or closed when it has stopped growing or shrinking 
+
+In the Changes to make section I implement option 3. 
+
+##  21.2 What we need to know 
+
+Casting a WebElement to RenderedWebElement gives us access to a new set of 'Physical' methods for the WebElement. Use the .getSize().height chain to check that the height is not changing. 
+
+##  21.3 Changes to make 
+
+###  21.3.1 menuHeading.java 
+    
+~~~~~~~~    
+    public void openClose() {
+      WebDriverWait wait = new WebDriverWait(driver,20);
+      ExpectedConditionFactory weCanSee = new ExpectedConditionFactory();
+...
+      By menuImage = By.xpath("//div[.=\""+ this.menuHeading + "\"]/../div/img");
+      driver.findElement(menuImage).click();
+...
+      By parentDiv = By.xpath("//div[.=\""+ this.menuHeading + "\"]/../../..");
+      wait.until(weCanSee.elementStopsGrowing(parentDiv, driver));
+    }
+~~~~~~~~
+
+###  21.3.2 ExpectedConditionFactory.java 
+
+I need to add a new method in the factory for elementStopsGrowing 
+    
+~~~~~~~~    
+    public ExpectedCondition elementStopsGrowing(By locator, WebDriver driver) {
+      return new ElementStopsGrowingCondition(locator, driver);
+    }
+~~~~~~~~    
+
+###  21.3.3 elementStopsGrowingCondition.java 
+    
+~~~~~~~~    
+    public ElementStopsGrowingCondition(By parentDiv, WebDriver driver) {
+      this.by = parentDiv;
+      setHeightDetails(((RenderedWebElement)
+          driver.findElement(parentDiv)).getSize().height);
+    }
+    private void setHeightDetails(int newHeight) {
+      this.lastHeight = newHeight;
+      this.hasBeenThisHeightFor = 1;
+    }
+    @Override
+    public Boolean apply(WebDriver driver) {
+      int currentHeight = ((RenderedWebElement)
+          driver.findElement(by)).getSize().height;
+      if( currentHeight == this.lastHeight){
+        this.hasBeenThisHeightFor++;
+      }else{
+        setHeightDetails(currentHeight);
+      }
+      if(this.hasBeenThisHeightFor > 2){
+        return true;
+      }else{
+        return false;
+      }
+    }
+~~~~~~~~    
+
+###  21.3.4 Additional Changes to MenuHeading.java 
+
+now we can tidy up Menu Heading and not have all those waits in the code 
+
+I can remove the call to the adhoc waits: 
+    
+~~~~~~~~    
+    public void open(){
+      if(isClosed()){
+        openClose();
+      }
+    }
+...
+    public void close(){
+      if(isOpen()){
+        openClose();
+      } 
+    }
+~~~~~~~~    
+    
+
+And I can remove the methods waitForClosed and waitForOpen. 
+
+The MenuHeading class now looks a lot tidier. 
+
+I think I would still like to create a proper isClosed rather than rely on a !isOpen but I don't want to change too much as I go along. 
+
+code checked in at revision 20 

@@ -1,0 +1,81 @@
+#  8 A Worked Example: Use Selenium 2.0 as a Selenium-RC Server 
+
+The first thing we should try for the migration is using Selenium 2.0 as a Selenium-RC server. 
+
+The selenium website advertises the Selenium 2.0 build as a drop in replacement so that will be our first migration strategy. Because if it works out of the box then the rest of our migration to using the WebDriver API should be pretty simple. 
+
+##  8.1 Amend Code to use external Selenium Server 
+
+For our first attempt at automating with Selenium 2.0 we will use our existing tests without amendment. By starting the selenium server at the command line. 
+
+We comment out the server code in CanVisitSiteTests.java 
+
+Hint: If you are using Eclipse then you can use Alt+Shift+S to get the source menu up and then press 'L' to comment out a selected set of lines. 
+
+The test now requires a Selenium server to be running before the test starts. 
+
+This is checked in as Revision 3 
+
+##  8.2 Run with Selenium 1.0 Server 
+
+This demonstrates that the tests do run against Selenium 1.0 server. 
+
+So in from one command line start the selenium server from the /libs directory: 
+
+~~~~~~~~
+> java -jar selenium-server.jar 
+~~~~~~~~
+
+From another command line run the tests using ant from the main project directory. 
+
+~~~~~~~~
+> ant test 
+~~~~~~~~
+
+Alternatively you could run the tests from the IDE by running CanVisitSiteTests.java as a JUnit set of tests. 
+
+Hint: on windows I use Console (http://sourceforge.net/projects/console/) to have multiple command line with a single window 
+
+##  8.3 Run with Selenium 2.0 Server 
+
+Remove Selenium 1.0 server library from the build path: 
+
+  * selenium-server.jar 
+
+Add Selenium 2.0 libraries to the build path: 
+
+  * selenium-server-standalone-2.0b3.jar 
+
+I downloaded the new jar from the Selenium site (http://seleniumhq.org/download/) 
+
+Run selenium 2.0 as the server 
+
+~~~~~~~~
+> java -jar selenium-server-standalone-2.0b3.jar 
+~~~~~~~~
+
+Run the tests. 
+
+> ant tests  
+or run from the IDE 
+
+If that didn't work (and it didn't for me on Windows 7 with IE 9), try: 
+
+  * changing the browser *firefox, (didn't work for me on FF 3.6) 
+  * *googlechrome (tests run, but they don't pass for me version 11), 
+  * - try starting the server in -singleWindow mode to make it easier to see 
+  * The tests run, but they don't pass. 
+
+Your mileage around what will work here may vary. I finished with *googlechrome in the code as the browser and started the server as 
+
+~~~~~~~~
+> java -jar selenium-server-standalone-2.0b3.jar -singleWindow 
+~~~~~~~~
+
+I could spend time investigating why it isn't working with the new server out the box, but it was only ever going to be a stop gap solution. I want to migrate over to Selenium 2.0 and use the WebDriver API so this was just a check to see if I could stop here and have a working project - but I can't so I need to continue with the migration before I count the migration as done. 
+
+You don't actually need the selenium client library any more so remove that from your build path, all the client code you need is in the selenium-server-standalone-2.0b3.jar 
+
+  * selenium-java-client-driver.jar 
+
+This is checked in as Revision 4 

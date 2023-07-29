@@ -1,0 +1,147 @@
+#  20 A Worked Example: MenuHeadings 
+
+##  20.1 What we need to do 
+
+MenuHeadings.java has always been the ugliest and hackiest page object in the code. 
+
+We only use Selenium in a few places: 
+
+  * to check if the menu is open or not
+
+    * this was an ugly check on the first item in the menu being present 
+
+  * Waiting for the menu to open or close
+
+    * a wait using the same condition as the isOpen method 
+
+  * Firing an event on the menu image to open or close the menu 
+
+##  20.2 What we need to know 
+
+WebDriver no longer has a fireEvent method - although you can clearly access it through the Selenium emulation as we currently do. But the normal WebElement methods have been designed to trigger all the appropriate events associated with an action so hopefully the new WebElement .click() will allow us to remove the fireEvent. 
+
+##  20.3 Changes to make 
+
+  * Start with SideMenu.java
+
+    * change the call to the MenuHeading constructor 
+
+  * selenium.IsElementPresent(...) becomes...
+
+    * Use of ...
+
+      * driver.findElement(By.method(...)) 
+
+  * selenium.fireEvent(...)
+
+    * Replaced by .click() 
+
+  * Use an adhoc wait for 
+
+    * WaitForOpen, waitForClosed 
+
+###  20.3.1 SideMenu.java 
+
+MenuHeading is a page component and used to represent every MenuHeading that we automate. 
+
+Start with SideMenu.java and pass driver through to MenuHeading. This has to be done for all instances of MenuHeading. 
+    
+~~~~~~~~    
+widgets = new MenuHeading(driver,"Widgets", "Checkbox");
+listsAndMenus = new MenuHeading(driver,"Lists and Menus", "List Box");
+textInput = new MenuHeading(driver,"Text Input", "Basic Text");
+tables = new MenuHeading(driver,"Tables", "Grid");
+cellWidgets = new MenuHeading(driver,"Cell Widgets", "Cell List");
+~~~~~~~~    
+
+This this is a pretty simple set of changes. Then we need to amend the constructor in MenuHeading.java to remove errors in SideMenu.java 
+
+###  20.3.2 MenuHeading.java 
+
+####  20.3.2.1 Constructor 
+
+change the constructor and remove the selenium declaration -- this flags up all the areas we have to change 
+    
+~~~~~~~~    
+    private WebDriver driver;
+...
+    public MenuHeading(WebDriver driver, 
+                String menuHeading, 
+                String firstMenuItemName) {
+      this.driver = driver;
+      this.menuHeading = menuHeading;
+      this.firstMenuItemName = firstMenuItemName;
+    }
+~~~~~~~~
+
+####  20.3.2.2 isOpen 
+
+Next change isOpen we will need to create our own isElementPresent and we will do that by trying to find the element and if we can't find it, say that it isn't present. 
+
+~~~~~~~~    
+    public boolean isOpen(){
+    	String firstItem = "//div[@class=\"GALD-WOBF\" and .=\"" + 
+                this.firstMenuItemName + "\"]";
+    	return(elementFound(By.xpath(firstItem)));
+    }
+    	
+    private boolean elementFound(By byLocator) {
+    	try{
+    		driver.findElement(byLocator);
+    		return true;
+    	}
+    	catch(NoSuchElementException e){
+    		return false;
+    	}
+    }
+~~~~~~~~    
+
+Make sure that when you use the NoSuchElementException in your code that you import the Selenium Exception, and not the Java library Exception. 
+    
+~~~~~~~~    
+    import org.openqa.selenium.NoSuchElementException;
+~~~~~~~~    
+
+Unfortunately this has always been the ugliest class in the automation but we are going to live with it, because it works and do the minimum needed to keep it working. 
+
+I'm going to use adhoc waits: 
+    
+~~~~~~~~    
+    private void waitForOpen() {
+    	new Wait("Did not open"){
+    		@Override
+    		public boolean until() {
+    			return isOpen();
+    		}
+    	};
+    }
+...
+    private void waitForClosed() {
+    	new Wait("Did not Close"){
+    		@Override
+    		public boolean until() {
+    			return !isOpen();
+    		}
+    	};
+    }
+~~~~~~~~
+
+And for the openClose, since WebDriver tries to trigger all the necessary events for us, we can just click, as a user would 
+    
+~~~~~~~~
+    public void openClose() {
+    	String menuImage = "//div[.=\""+ this.menuHeading + "\"]/../div/img";
+    	driver.findElement(By.xpath(menuImage)).click();
+    }
+~~~~~~~~
+    
+
+Run the tests. 
+
+The tests work on Firefox 4.0 but not on Firefox 3.6 -- why not? 
+
+Well if you watch the GUI you can see the menu sliding down, and while it is available to be clicked, nothing will happen in Firefox 3.6 as it slides down with its javascript css magic. In Firefox 4.0 the problem does not manifest, perhpas it does it all fast enough that the tests pass, or allows clicking as the menu opens. 
+
+Regardless, since I know about this problem I'll do something about it in the next chapter. 
+
+code checked in at revision 19 

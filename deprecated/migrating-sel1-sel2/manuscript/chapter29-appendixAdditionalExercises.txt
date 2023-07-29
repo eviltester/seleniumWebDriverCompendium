@@ -1,0 +1,10 @@
+#  29 Appendix - Additional Exercises 
+
+  * Change the wait in GWTShowcase to use a WebDriverWait 
+  * Wrap the alert checking in BasicButtonPanel in a WebDriverWait 
+  * Refactor RadioButtonsPanel to remove repeated code 
+  * Convert more page object models to use page factory 
+  * Add more tests 
+  * Amend MenuHeading to have better isOpen isClosed methods 
+  * Make tests run cross browser 
+  * create a GWTPanel object or interface with an isPageTitleCorrect method to allow me to refactor the code. Particularly in HyperLinksPanel.java 

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="migrationWorkshop">
+    <property environment="env"/>
+    <property name="junit.output.dir" value="junit"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="migrationWorkshop.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="libs/junit-4.9b2.jar"/>
+        <pathelement location="libs/selenium-server-standalone-2.0b3.jar"/>
+    	<pathelement location="libs/SimpleWebServerFull.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src/java">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src/test">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="init" name="build">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src/java"/>
+        	 <src path="src/test"/>
+            <classpath refid="migrationWorkshop.classpath"/>
+        </javac>
+    </target>
+    <target name="runtests" depends="build">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="com.eviltester.gwtshowcase.CanVisitSiteTests" todir="${junit.output.dir}"/>
+            <classpath refid="migrationWorkshop.classpath"/>
+        </junit>
+    </target>
+    <target name="junitreport">
+        <junitreport todir="${junit.output.dir}">
+            <fileset dir="${junit.output.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${junit.output.dir}"/>
+        </junitreport>
+    </target>
+	<target name="test" depends="runtests,junitreport"/>
+</project>

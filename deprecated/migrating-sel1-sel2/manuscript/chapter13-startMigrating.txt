@@ -1,0 +1,170 @@
+#  13 A Worked Example: Start migrating to WebDriver 
+
+At the moment the test class CanVisitSiteTest.java instantiates a WebDriver object, but it only uses it to instantiate a selenium emulation object. If we really plan to migrate to WebDriver we need to start using the driver directly. 
+
+We also want to keep the old tests working as we migrate, so we have to keep using the emulation object, but we need to keep the emulation object moving down the abstraction layers until we can wipe it out. This means we need to support both Selenium and WebDriver in the tests and page object models (for a while). 
+
+Our next migration step requires us to pass driver through to the GWTShowcase object instead of selenium. 
+
+We are going to remove selenium from the test and just have WebDriver. The selenium instance will be created in GWTShowcase. 
+
+##  13.1 Summary of steps 
+
+If you want to try it yourself before reading this chapter then here is a summary of the basic steps to take 
+
+  1. Promote WebDriver to the same level as Selenium in CanVisitSiteTests.java 
+  2. Remove selenium from CanVisitSiteTests.java 
+  3. Pass driver and apphost to the GWTShowcase constructor 
+  4. Amend the GWTShowcase constructor to create a WebDriverBackedSelenium object to pass throug to the rest of the Page Object hierarchy 
+
+You already know all the technical details about WebDriver and Selenium to make the changes. 
+
+##  13.2 Start with the Tests and work down 
+
+###  13.2.1 Add WebDriver as a field 
+
+In our test at the moment we have two fields in CanVisitSiteTests.java: 
+
+~~~~~~~~    
+    private static Selenium selenium; 
+    private static SimpleWebServer appserver;
+~~~~~~~~    
+
+We need to promote WebDriver to the same level as Selenium so that it can be used by all our tests. 
+
+So we create a field for WebDriver in CanVisitSiteTests.java 
+    
+~~~~~~~~    
+    private static WebDriver driver;
+~~~~~~~~    
+
+In order to make use of this we have to amend startSelenium as follows. To change 
+    
+~~~~~~~~    
+    WebDriver driver = new FirefoxDriver(profile);
+~~~~~~~~    
+
+so that it becomes: 
+    
+~~~~~~~~    
+    driver = new FirefoxDriver(profile);
+~~~~~~~~    
+
+###  13.2.2 Remove Selenium 
+
+For this particular class, if you scroll through it you will see that selenium is only used to construct the GWTShowcase objects. And since we want to use driver we will just remove Selenium. 
+
+Do this by removing the field (either delete the line or comment it out): 
+
+~~~~~~~~    
+    // private static Selenium selenium; 
+~~~~~~~~    
+
+Your IDE should now show all the places in the code where Selenium is used, and we can convert those over to WebDriver. 
+
+So we remove the following line in the startSelenium method: 
+
+~~~~~~~~    
+    selenium = new WebDriverBackedSelenium(driver,"http://localhost/");
+~~~~~~~~    
+
+We need to amend the @AfterClass method to remove selenium.close() change the @AfterClass to read: 
+
+~~~~~~~~    
+    @AfterClass
+    public static void stopWebDriver(){
+    driver.close();
+    }
+~~~~~~~~    
+
+Then the rest of the errors are the same, where we construct GWTShowcase objects. 
+
+So convert all those lines: 
+    
+~~~~~~~~    
+    GWTShowcase showcase = new GWTShowcase(selenium);
+~~~~~~~~    
+
+to 
+
+~~~~~~~~    
+    GWTShowcase showcase = new GWTShowcase(driver,apphost);
+~~~~~~~~    
+
+These lines will still show as being in error because we haven't converted the GWTShowcase constructor yet. 
+
+We have to amend the calls to the constructor so that we tell GWTShowcase know the base url for the application. 
+
+This requires us to make the apphost variable a field as well. 
+
+Amend: 
+
+~~~~~~~~    
+    String apphost = props.getProperty("apphost","http://localhost:8088/");
+~~~~~~~~    
+
+to 
+
+~~~~~~~~
+    apphost = props.getProperty("apphost","http://localhost:8088/");
+~~~~~~~~    
+
+and add a field for apphost 
+    
+~~~~~~~~    
+    private static String apphost;
+~~~~~~~~    
+
+Also rename the @BeforeClass method 
+    
+~~~~~~~~    
+    	@BeforeClass
+    	public static void startDriver(){
+~~~~~~~~    
+
+##  13.3 Change GWTShowcase Constructor 
+
+Either amend the existing GWTShowcase constructor or create a new GWTShowcase constructor automatically 
+
+Amend the GWTShowcase constructor so that it reads as follows: 
+    
+~~~~~~~~    
+    public GWTShowcase(WebDriver driver,String apphost) {
+      this.driver = driver;
+      this.selenium = new WebDriverBackedSelenium(driver,apphost);
+    }
+~~~~~~~~    
+
+Here we have just moved the selenium emulation layer, out of the test case class, and into the GWTShowcase class. We will continue to move this line of code as we slowly migrate the tests and page object models away from Selenium. 
+
+Create a field for driver: 
+    
+~~~~~~~~    
+    private WebDriver driver;
+~~~~~~~~    
+
+Fix the errors by adding the correct imports: 
+    
+~~~~~~~~    
+    import org.openqa.selenium.WebDriver; 
+    import org.openqa.selenium.WebDriverBackedSelenium;
+~~~~~~~~    
+
+Remove the previous GWTShowcase(Selenium ...) constructor, if you haven't already. 
+
+We still keep Selenium here for the moment, but we will work on getting rid of this. 
+
+##  13.4 Run the tests 
+
+Running the tests again and they should all still pass. 
+
+##  13.5 Summary 
+
+We will use this basic migration pattern again: 
+
+  * Convert a class to WebDriver 
+  * Pass Driver through to the next layer to convert 
+  * In the layer we just passed in Driver, create a WebDriverBackedSelenium to pass through to all its child classes 
+
+The above code has been committed as revision 10   
+I also made changes to the Firefox properties methods to remove the stack trace reporting as revision 11 

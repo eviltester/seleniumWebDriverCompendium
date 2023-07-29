@@ -1,0 +1,154 @@
+#  32 Appendix - Chapter 21 Walkthrough 
+
+This is a longer walkthrough of the steps for Chapter 21 in case the thought processes around building the code in Chapter 21 were not clear to the reader. 
+
+The problem in the sidemenu is that we are trying to click on something which is there, but isn't responsive to clicks yet. 
+
+We can solve that by waiting with a Thread.sleep either after the openClose() method in MenuHeading.java or before we click on it on SideMenu.java clickSubMenuItem 
+
+Or we could have a more clever wait in either of these places 
+
+Having tried (and failed) to add robust checks in the SideMenu.java I am going to add checks in the MenuHeading so that it doesn't exist openClose() until the menu item has openClosed 
+
+I am going to do this by monitoring the size of the menu and waiting until it stops moving. 
+
+I basically want the code to look something like 
+    
+~~~~~~~~    
+    public void openClose() {
+    driver.findElement(By.xpath(
+        "//div[.=\""+ this.menuHeading + "\"]/../div/img")).click();
+    wait.until(weCanSee.elementStopsGrowing(parentDiv, driver));
+    }
+~~~~~~~~    
+
+So I add that to my code and all I have to do is get it working! 
+
+I'll create weCanSee in the MenuHeading.java constructor 
+    
+~~~~~~~~    
+    weCanSee = new ExpectedConditionFactory();
+~~~~~~~~    
+
+Automatically create the field variable 
+
+I'll add the wait in the MenuHeading.java constructor 
+
+~~~~~~~~    
+    wait = new WebDriverWait(driver,20);
+~~~~~~~~    
+
+Automatically create the field variable 
+
+Then I'll identify the parentDiv for the control and I'll use relative xpath for this as it is nice and easy. 
+    
+~~~~~~~~    
+    By parentDiv = By.xpath(
+        "//div[.=\""+ this.menuHeading + "\"]/../../..");
+~~~~~~~~    
+
+Then I'll autocreate the elementStopsGrowing in the ExpectedConditionFactory 
+
+amend it so that it is ExpectedCondition
+    
+~~~~~~~~    
+    public ExpectedCondition elementStopsGrowing(By parentDiv,
+    WebDriver driver) {
+    // TODO Auto-generated method stub
+    return null;
+    }
+~~~~~~~~    
+
+giving me a nice clean openClose() method in MenuHeading.java 
+    
+~~~~~~~~    
+    public void openClose() {
+    driver.findElement(By.xpath(
+        "//div[.=\""+ this.menuHeading + "\"]/../div/img")).click();
+    By parentDiv = By.xpath(
+        "//div[.=\""+ this.menuHeading + "\"]/../../..");
+    wait.until(weCanSee.elementStopsGrowing(parentDiv, driver)); 
+    }
+~~~~~~~~    
+
+Now all I have to do is implement the ExpectedCondition 
+
+I'll do that by defining what it looks like in ExpectedConditionFactory 
+    
+~~~~~~~~    
+    public ExpectedCondition elementStopsGrowing(By parentDiv, WebDriver driver) {
+    return new ElementStopsGrowingCondition(parentDiv, driver);
+    }
+~~~~~~~~    
+
+And autocreating the class in PageObjects.wait 
+
+And autocreating the constructor 
+    
+~~~~~~~~    
+public class ElementStopsGrowingCondition implements ExpectedCondition {
+public ElementStopsGrowingCondition(By parentDiv, WebDriver driver) {
+// TODO Auto-generated constructor stub
+}
+@Override
+public Boolean apply(WebDriver arg0) {
+// TODO Auto-generated method stub
+return null;
+}
+}
+~~~~~~~~    
+    
+
+First amend the constructor in ElementStopsGrowingCondition to store the passed in parentDiv in a by object 
+
+Then get the initial height of the parent div using RenderedWebElement 
+    
+~~~~~~~~    
+public ElementStopsGrowingCondition(By parentDiv, WebDriver driver) {
+this.by = parentDiv;
+setHeightDetails(((RenderedWebElement)
+    driver.findElement(parentDiv)).getSize().height);
+}
+~~~~~~~~    
+
+autoCreate the by field 
+
+Then auto create the setHeightDetails method 
+
+In setHeightDetails we want to store the newHeight as the lastHeight so we can compare it and keep a count of the time it has been that height 
+    
+~~~~~~~~    
+    private void setHeightDetails(int newHeight) {
+    this.lastHeight = newHeight;
+    this.hasBeenThisHeightFor = 1;
+    }
+~~~~~~~~    
+    
+
+autocreate the fields 
+
+now amend the apply to get the current height 
+
+  * then increment the hasbeenheightfor count if the height is the same 
+  * if height is different then reset the height details 
+  * if the height is stable then return true, otherwise return false to keep the wait going 
+    
+~~~~~~~~    
+    public Boolean apply(WebDriver driver) {
+    int currentHeight = ((RenderedWebElement)
+        driver.findElement(by)).getSize().height;
+    if( currentHeight == this.lastHeight){
+    this.hasBeenThisHeightFor++;
+    }else{
+    setHeightDetails(currentHeight);
+    }
+    if(this.hasBeenThisHeightFor > 2){
+    return true;
+    }else{
+    return false;
+    }
+    }
+~~~~~~~~    
+    
+
+Also we don't need the waitForOpen or waitForClosed methods now so we can remove them from MenuHeading.java 

@@ -1,0 +1,64 @@
+#  15 A Worked Example: Add Driver to SideMenu 
+
+The vast bulk of our work now is going to be done in the Page Object Models. 
+
+Pushing Selenium ever lower in the abstraction and using driver more. 
+
+##  15.1 What we need to do 
+
+Our second pass through GWTShowcase.java 
+
+  * Inject driver into SideMenu
+
+    * New constructor 
+    * Create WebDriverBackedSelenium in SideMenu 
+
+  * Remove selenium from GWTShowcase 
+
+##  15.2 What we need to know 
+
+Everything for this chapter we have already done before. We are simply moving the emulation layer lower in the Page Object hierarchy. 
+
+##  15.3 Changes to make 
+
+###  15.3.1 In GWTShowcase.java 
+
+  * In GWTShowcase.java change the sideMenu method to use driver 
+
+~~~~~~~~    
+    public SideMenu sideMenu() {
+    return new SideMenu(selenium);
+    }
+~~~~~~~~    
+
+to ... 
+    
+~~~~~~~~    
+    public SideMenu sideMenu() {
+    return new SideMenu(driver,apphost);
+    }
+~~~~~~~~    
+
+We have to pass apphost through to SideMenu because we are still using the Selenium emulation layer. 
+
+###  15.3.2 In SideMenu.java 
+
+  * Remove the error in GWTShowcase by changing the SideMenu constructor to use driver 
+  * Then cut the code out of GWTShowcase.java and move it to SideMenu.java 
+    
+~~~~~~~~    
+    this.driver = driver;
+    this.selenium = new WebDriverBackedSelenium(driver,apphost);
+~~~~~~~~    
+
+  * Fix the errors in SideMenu.java by creating a field and importing WebDriver 
+
+###  15.3.3 Tidy Both Classes up 
+
+  * Remove all the unneeded imports from GWTShowcase. 
+
+The reason for tidying everything up, is that if we have forgotten something, then removing the declarations will expose it as an error. e.g. if I remove the declaration of Selenium, but try and use it then I'll get errors in the code. 
+
+GWTShowcase is done now, and converted over to WebDriver. 
+
+code checked in as revision 13 

@@ -1,0 +1,100 @@
+#  1 Introduction 
+
+## About this book
+
+This book was written in 2011 and updated in 2014 to support migration from Selenium 1 to Selenium 2.
+
+You can find more information about Selenium 1 in my book Selenium Simplified (open sourced)
+
+- http://www.compendiumdev.co.uk/selenium/
+
+This book was the text for a workshop I conducted on Migrating from Selenium 1 to Selenium 2.
+
+It was supported by a subversion repo.
+
+For the purposes of open sourcing this text and releasing it in June 2018 I have:
+
+- only edited the text of this book to allow it to generate a pdf
+- amended the source code to be slightly better formatted by using `~~~~~~~~` blocks
+- added the images that were missing from the original doc
+- line wrapped the source code so it doesn't fall off the page when generated as a pdf
+- I have deleted the svn repo but in the repo for this book you will find:
+    - `\initial-code`. - revision 2 of the svn repo
+    - `\migrated-code` - final revision of the svn repo after making the changes in this book 
+
+This was my first attempt at creating a 'case study book'. My most recent case study book is:
+
+- [Automating and Testing a REST API](https://www.compendiumdev.co.uk/page/tracksrestapibook)
+
+The current text you are reading has the issue that source code snippets were copy and pasted into the text making the entire process more labour intensive and error-prone. I didn't spend much time formatting them, and there are many inline code snippets that would benefit from some `code formatting` but I haven't spent the time doing that.
+
+I'm releasing this as a 'historical' artifact. It might still have some value - not in terms of migrating from Selenium1 to Selenium 2 (or 3 at the time of writing). But more in terms of the thought processes used to migrate and refactor code.
+
+You might also gain some value from the page object refactorings that I have used.
+
+I no longer use Ant, I try to avoid annotations when I code so I avoid the Page object annotations from Selenium.
+
+The code will not build as I have not added the dependencies into the repo. I recommend reading the code, rather than running the code - it is very old after all.
+
+I haven't read the text to review its accuracy, I've left the contents pretty much as they were when I last committed in 2014.
+
+- I suspect that most of the URLs listed will not work.
+
+This was originally written to release as a [leanpub](http://leanpub.com) document, so might act as an example of a book formatted for that platform. This current pdf was not generated through leanpub it was generated using:
+
+- https://github.com/eviltester/pandocifier
+- https://pandoc.org/
+
+> **No warranty provided - treat as a historical artificat.**
+> Alan Richardson , June 2018
+
+
+
+
+
+
+
+##  1.1 Why Migrate? 
+
+You have a set of tests in Selenium 1.0 and you are happy so why Migrate? 
+
+Well Selenium 2.0 offers the WebDriver API which is a much better API for programming against. 
+
+Selenium 2.0 is the version that will be maintained. If you haven't already encountered issues by upgrading your Firefox version to 4 then when you do upgrade to 4 you might have to amend the Selenium 0.9 or 1.x jars to use FireFox 4. 
+
+Now might not be the right time for you to commit to migration. But it may be the perfect opportunity to learn the differences between Selenium 1.0 and Selenium 2.0 and investigate some migration strategies open to you. This Book aims to help you do that. 
+
+##  1.2 Key Skills You need to learn to code in Selenium 2.0 
+
+Learn to read Java: 
+
+  * you need to read the Selenium 2.0 source code 
+
+Learn to read forums 
+
+  * you need to see how other people have used the code and the questions they have 
+
+Connect to the IM Server 
+
+  * Here you can get real time feedback on your questions 
+
+Learn to code Java 
+
+  * When you read the Selenium source code, the better your Java programming skills the better you will understand some of the more exotic classes without needing to follow tutorials. 
+  * e.g. PageObjectFactory 
+
+Use StackOverflow 
+
+  * If your question has been asked and answered on StackOverflow then the answer may well make more sense than the snippets seen in the Forums where the replies can be rather terse 
+
+##  1.3 Caveats 
+
+This migration used Firefox 4, IE8, Selenium 2.0b3. Tests were executed on Windows 7, Windows XP and Linux (using saucelabs.com). 
+
+You may encounter different issues during the migration with later versions of Selenium and with different browsers and operating systems. 
+
+We have taken some steps to support Firefox 3.6 and IE9 
+
+##  1.4 How to use this text 
+
+This text is the self study guide component of the "Migrate to Selenium 2.0" Training programme. 

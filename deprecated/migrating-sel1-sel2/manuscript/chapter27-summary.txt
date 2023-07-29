@@ -1,0 +1,49 @@
+#  27 Summary 
+
+##  27.1 Conclusions 
+
+  * Converting from Selenium 1.0 to Selenium 2.0 is not seamless
+
+    * use Selenium 1.0 and Selenium 2.0 in parallel 
+    * Keep tests working as you convert 
+
+  * You will encounter problems we haven't covered here
+
+    * e.g. use of xpaths -- I had to convert to css selectors for one site I was testing 
+
+  * You will need to download and read the Selenium 2.0 source code as you test 
+
+WebDriverBackedSelenium is a great class to know. Start with WebDriver for your future tests, but if you get into problems, remember you can instantiate a WebDriverBackedSelenium object and: 
+
+  * access all the old fireEvent, 
+  * keyPress(etc.) commands that you used before, 
+  * you can 'blast' text into elements with type 
+
+A great class to know to help you build workarounds if you face what looks like a WebDriver 'bug' due to Javascript events not firing as you expect. 
+
+And remember if you do drop down to WebDriverBackedSelenium in the middle of a test, you do not need to pass in a base domain. You an instantiate a WebDriverBackedSelenium object like 
+    
+~~~~~~~~    
+    Selenium selenium = new WebDriverBackedSelenium(driver,""); 
+~~~~~~~~    
+
+Because it is an emulation layer, it uses the driver you passed in, and you'll only really have problems if you explore the .open since that uses the baseDomain, otherwise for adhoc usage, you probably don't need to pass in the base domain. 
+
+##  27.2 Coverage 
+
+  * Basics of Selenium 2.0 
+  * Selenium 1.0 Page Object Model Techniques 
+  * Selenium 1.0 waitForCondition 
+  * FirefoxDriver Profiles 
+  * WebBackedSeleniumDriver 
+  * Driver is king 
+  * Findelement By 
+  * Wait, WebDriverWait, ExpectedCondition 
+  * Factories for readability 
+  * JavascriptExecutor 
+  * driver.switchTo.alert() 
+  * driver.getTitle() 
+  * RenderedWebElement 
+  * sendKeys 
+  * Keys. 
+  * PageFactory 

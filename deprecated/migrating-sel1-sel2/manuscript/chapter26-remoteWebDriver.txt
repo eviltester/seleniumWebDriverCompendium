@@ -1,0 +1,110 @@
+#  26 Remote WebDriver 
+
+##  26.1 What we need to do 
+
+The easiest way to demonstrate RemoteWebDriver is to sign up for a saucelabs.com account. Saucelabs.com offer a free 200 minutes a month account. You can use this to explore the RemoteWebDriver functionality. This is easier than providing instructions on how to setup your own RemoteWebDriver server. 
+
+  * Visit saucelabs.com 
+  * Signup 
+
+Once you have logged in, if you visit the Selenium2 page in the docs then you will see sample code for how to use the RemoteWebDriver interface on Saucelabs: 
+
+  * http://saucelabs.com/docs/selenium2 
+
+##  26.2 What we need to know 
+
+RemoteWebDriver lets you automate a browser on a different server. This is a close approximation to the old usage of Selenium-RC as a server. 
+
+  * create a RemoteWebDriver with the url provided to you by Saucelabs 
+  * amend the DriverFactory to instantiate a connection to the remote server instead of the local one 
+  * use http://gwt.google.com/samples/Showcase/ as the apphost instead of the localhost 
+  * RemoteWebDriver uses DesiredCapabilities to know which browser to use 
+
+##  26.3 Changes to make 
+
+For the purposes of this exercise I decided to keep things simple and only make changes to the DriverFactory.java 
+
+In the getDriver method of DriverFactory I added two new browserCode checks: 
+    
+~~~~~~~~    
+    		if(browserCode.contentEquals("*sauce_firefox_windows")){
+    			return getSauceLabsDriver("firefox", "3.6.", Platform.XP);
+    		}	
+    		if(browserCode.contentEquals("*sauce_firefox_linux")){
+    			return getSauceLabsDriver("firefox", "3.6.", Platform.LINUX);
+    		}	
+~~~~~~~~    
+
+I then created a getSauceLabsDriver method: 
+
+~~~~~~~~    
+    private static WebDriver getSauceLabsDriver(
+              String browser, String version, Platform platform){
+    ?
+      DesiredCapabilities capabilities = new DesiredCapabilities(
+    		           browser, version, platform);
+      capabilities.setCapability("name", "Migration Tests");
+    		
+      URL mySauceLabsAccountURL=null;
+      try {
+        mySauceLabsAccountURL = new URL(getSauceLabsRemoteAddress());
+      } catch (MalformedURLException e) {
+        e.printStackTrace();
+      }
+    		
+      return new RemoteWebDriver(mySauceLabsAccountURL,capabilities);
+    }
+~~~~~~~~    
+    
+
+The getSauceLabsRemoteAddress() method reads a remoteaddress property from a saucelabs.properties file which you need to create in the root directory of your tests. 
+    
+~~~~~~~~
+    	private static String getSauceLabsRemoteAddress() {
+    		Properties props;
+    		props = new Properties();
+    		String propertyFile = "saucelabs.properties";
+    		
+    		try {
+    			props.load(new FileInputStream("./" + propertyFile));
+    		} catch (FileNotFoundException e) {
+    			System.out.println("No Saucelabs Properties file found");
+    		} catch (IOException e) {
+    			System.out.println("Error loading Saucelabs properties file");
+    		}
+    		 
+    		return props.getProperty("remoteaddress","");
+    	}
+~~~~~~~~    
+
+You can find the Remote address for saucelabs at [https://saucelabs.com/docs/selenium2](https://saucelabs.com/docs/selenium2)
+
+Amend the saucelabs.properties file in the directory 
+
+At the current time of writing, the saucelabs url takes the form: 
+
+~~~~~~~~
+http://:@ondemand.saucelabs.com:80/wd/hub 
+~~~~~~~~
+
+But you can find all the details you need on the selenium2 page at saucelabs.com 
+
+Then I changed the migrationTest.properties file: 
+   
+~~~~~~~~    
+    browser = *sauce_firefox_windows
+    useLocalAppServer = no
+    apphost = http://gwt.google.com/samples/Showcase/
+~~~~~~~~    
+
+This runs the tests against the google hosted GWT showcase, which may have changed by the time you come to run this, but you have to run the tests against a server that saucelabs can reach. 
+
+Then run the tests as normal. 
+
+You can see the status of your tests by clicking on `"OnDemand\View My Tests"` from the saucelabs dashboard. 
+
+At this point your tests are running on your machine, but executing against a browser on the saucelabs machine. 
+
+This code has been checked in, but the default remoteaddress in saucelabs.properties has been defined as "change this". 
+
+code checked in at revision 26 

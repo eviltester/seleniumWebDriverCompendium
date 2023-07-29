@@ -1,0 +1,20 @@
+#  6 A Worked Example: Overview of the Application Under Test 
+
+With java -jar SimpleWebServer.jar running. 
+
+Visit http://localhost/ShowCase.html 
+
+  * GWT 
+  * Java compiled to JavaScript 
+  * Lots of JavaScript 
+  * Event Triggering Required 
+  * JavaScript Sync Issues 
+  * Small app, Good Challenge 
+
+Screenshots illustrate Lack of IDs, 'Ajax' updates 
+
+Explain moving sidebars up and down 
+
+mention in /demoSites 
+
+mention the SimpleWebServer.jar 

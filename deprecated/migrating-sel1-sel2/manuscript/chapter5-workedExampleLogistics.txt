@@ -1,0 +1,82 @@
+#  5 A Worked Example: Logistics 
+
+##  5.1 Setup your environment 
+
+To follow along with this tutorial. You will need to install some tools. 
+
+* A Java IDE, because you will be writing Java code and running tests from the IDE 
+    * Eclipse ([http://www.eclipse.org/](http://www.eclipse.org/)) 
+    * NetBeans ([http://netbeans.org](http://netbeans.org)) 
+    * IntelliJ IDEA ([http://www.jetbrains.com/idea/](http://www.jetbrains.com/idea/)) 
+
+* Subversion client either GUI or command line tools
+    * You will need to checkout the source code for the workshop and (optionally) the sourcecode for Selenium. 
+    * [http://subversion.apache.org/](http://subversion.apache.org/)
+    * On Windows I use [http://tortoisesvn.tigris.org/](http://tortoisesvn.tigris.org/)
+    * Or I install a full subversion setup via the visual svn server [http://www.visualsvn.com/server/](http://www.visualsvn.com/server/)
+
+##  5.2 Download the workshop sourcecode 
+
+Create a directory to store everything. 
+
+* `...\workspace\advancing`
+
+Checkout the workshop source code at revision 2 into the location on your disk 
+
+`> svn checkout -r 2 http://svn3.xp-dev.com/svn/miration/trunk/`
+
+You can see the command line format above. Or copy the url of the repository into TortoiseSVN [http://svn3.xp-dev.com/svn/migration/trunk/](http://svn3.xp-dev.com/svn/migration/trunk/)
+
+Checkout revision 2 if you want to start at the beginning. You can always update to a different revision at any point. 
+
+Import it into your IDE. 
+
+Run the tests to make sure you have everything configured properly. 
+
+You want the Selenium 1.0 jars in your build path at the start, not selenium-server-standalone-2.0b3.jar 
+
+##  5.3 Run it from Ant 
+
+Install ant ([http://ant.apache.org/](http://ant.apache.org/)) 
+
+You can check that you have it installed by running 
+
+`> ant -version`
+
+There is a simple windows installer available from [http://wiki.apache.org/ant/AntOnWindows](http://wiki.apache.org/ant/AntOnWindows)
+
+##  5.4 Import the Source into your IDE 
+
+###  5.4.1 Eclipse 
+
+###  5.4.2 IntelliJ 
+
+###  5.4.3 NetBeans 
+
+##  5.5 Start the application under test 
+
+`Java -jar SimpleWebServer.jar`
+
+##  5.6 Change the Build Path 
+
+##  5.7 Run The Tests 
+
+`Run CanVisitSiteTests.java`
+
+##  5.8 Using Subversion to workthrough the examples 
+
+'answer'  is referenced during the text 
+
+After Checkout During workshop 
+
+> svn revert * -R
+
+`svn update -r`
+
+During the workshop you can update the code base to the 'sample' answers at any time. 
+
+Before I do that I do a "revert" to remove all my changes. So if you update as you go through (and you probably will) and you want to keep you code then copy it off somewhere. 
+
+You are probably better off making notes than keeping all your code. 
+
+The workshop source starts at revision 2, and this is code using the Selenium 1.0 server. 

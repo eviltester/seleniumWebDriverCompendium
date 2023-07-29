@@ -1,0 +1,186 @@
+#  18 A Worked Example: RadioButtonsPanel 
+
+##  18.1 What we need to do 
+
+  * Amend SideMenu.java to construct RadioButtonPanel with WebDriver. 
+  * Additionally amend HyperLinksPanel because RadioButtonPanel called from there too. 
+  * Fully remove Selenium from HyperLinksPanel in the process as we will no longer need the Selenium emulation layer 
+
+##  18.2 What we need to know 
+
+  * Amend constructors to take WebDriver 
+  * WebDriver .findElement and WebElement .click 
+  * driver.getTitle 
+  * Handling radio buttons using WebElement methods:
+
+    * isSelected 
+    * setSelected 
+
+##  18.3 Changes to Make 
+
+  * Start at SideMenu.java
+
+    * Change the constructor 
+
+  * Again need to amend HyperLinksPanel as well 
+  * selenium.isChecked becomes...
+
+    * driver.findElement(By...).isSelected(); 
+
+  * selenium.check becomes...
+
+    * driver.findElement(By...).setSelected(); 
+
+###  18.3.1 SideMenu.java 
+
+Change the selectWidgetsRadioButton 
+    
+~~~~~~~~    
+    public RadioButtonsPanel selectWidgetsRadioButton() {
+      clickSubMenuItem("Radio Button");
+      return new RadioButtonsPanel(selenium); 
+    }
+~~~~~~~~    
+
+to 
+    
+~~~~~~~~    
+    public RadioButtonsPanel selectWidgetsRadioButton() {
+      clickSubMenuItem("Radio Button");
+      return new RadioButtonsPanel(driver); 
+    }
+~~~~~~~~    
+
+After all the changes to HyperLinksPanel to remove selenium, we can remove apphost from the HyperLinksPanel constructor: 
+    
+~~~~~~~~    
+    public HyperLinksPanel selectWidgetsHyperlink() {
+      clickSubMenuItem("Hyperlink");
+      return new HyperLinksPanel(driver); 
+    }
+~~~~~~~~    
+
+###  18.3.2 HyperLinksPanel.java 
+
+We can migrate the HyperLinksPanel class completely: 
+
+####  18.3.2.1 isPageTitleCorrect 
+
+isPageTitleCorrect has the normal amendment to use driver.getTitle instead of selenium.getTitle 
+    
+~~~~~~~~    
+    public boolean isPageTitleCorrect() {
+      return driver.getTitle().endsWith("Hyperlink");
+    }
+~~~~~~~~    
+
+####  18.3.2.2 selectRadioButtonLink 
+
+For selectRadioButtonLink we find the element by the ID and click on the WebElement 
+    
+~~~~~~~~    
+    public RadioButtonsPanel selectRadioButtonLink() {
+      String elementID =
+        "gwt-debug-cwHyperlink-com.google.gwt.sample.showcase." +
+        "client.content.widgets.CwRadioButton";
+      driver.findElement(By.id(elementID)).click();
+      return new RadioButtonsPanel(driver);
+    }
+~~~~~~~~    
+    
+
+####  18.3.2.3 selectBasicButtonLink 
+
+For selectBasicButtonLink we find the element by the ID and click on the WebElement 
+    
+~~~~~~~~    
+    public BasicButtonPanel selectBasicButtonLink() {
+      String elementID =
+        "gwt-debug-cwHyperlink-com.google.gwt.sample.showcase." +
+        "client.content.widgets.CwBasicButton";
+      driver.findElement(By.id(elementID)).click();
+      return new BasicButtonPanel(driver);
+    }
+~~~~~~~~    
+    
+
+####  18.3.2.4 Constructor 
+
+Then we can remove all references to selenium in this class and amend the constructor and imports. 
+    
+~~~~~~~~    
+    private WebDriver driver;
+      public HyperLinksPanel(WebDriver driver) {
+      this.driver = driver;
+    }
+~~~~~~~~    
+    
+
+This change causes us to amend the call to HyperLinksPanel in the SideMenu 
+
+###  18.3.3 RadioButtonsPanel.java 
+
+####  18.3.3.1 Constructor 
+
+We don't need to pass selenium through to anything so the constructor will just become a simple WebDriver constructor 
+    
+~~~~~~~~    
+    private WebDriver driver;
+    public RadioButtonsPanel(WebDriver driver) {
+    this.driver = driver ;
+    }
+~~~~~~~~    
+
+####  18.3.3.2 isPageTitleCorrect 
+
+fix isPageTitleCorrect by changing selenium to driver 
+    
+~~~~~~~~    
+    public boolean isPageTitleCorrect() {
+      return driver.getTitle().endsWith("Radio Button");
+    }
+~~~~~~~~    
+
+####  18.3.3.3 Radio button handling 
+
+For radio button handling the pattern is pretty simple: 
+
+  * set it:
+
+    * driver.findElement(By.id(elementID)).setSelected(); 
+
+  * check if selected
+
+    * return driver.findElement(By.id(elementID)).isSelected(); 
+
+We can use .toggle() on a checkbox. 
+
+For radio buttons .click() would have been synonymous with .setSelected(). But setSelected seems simple and readable. 
+    
+~~~~~~~~    
+    public boolean isSportSelected(String sportName) {
+    		String elementID = "gwt-debug-cwRadioButton-sport-" + 
+            sportName.replaceAll(" ", "") + "-input";
+    		return driver.findElement(By.id(elementID)).isSelected();
+    	}
+    	
+    	public void selectSport(String sportName) {
+    		String elementID = "gwt-debug-cwRadioButton-sport-" + 
+          sportName.replaceAll(" ", "") + "-input";
+    		driver.findElement(By.id(elementID)).setSelected();
+    	}	
+...
+    	public boolean isColorSelected(String colorName) {
+    		String elementID = "gwt-debug-cwRadioButton-color-" + 
+          colorName + "-input";
+    		return driver.findElement(By.id(elementID)).isSelected();		
+    	}	
+...
+    	public void selectColor(String colorName) {
+    		String elementID = "gwt-debug-cwRadioButton-color-" + 
+          colorName + "-input";
+    		driver.findElement(By.id(elementID)).setSelected();
+    	}	
+~~~~~~~~
+
+code checked in as revision 17 

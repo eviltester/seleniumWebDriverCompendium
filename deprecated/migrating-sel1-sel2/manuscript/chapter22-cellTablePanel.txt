@@ -1,0 +1,149 @@
+#  22 A Worked Example: CellTablePanel 
+
+##  22.1 What we need to do 
+
+CellTablePanel has us entering text into a field, and firing events. But it also has the first part of our tests where I could not get the Page Objects working, so when we migrate CellTablePanel we have our first opportunity to fix some of the broken tests. In this case we have to use WebDriver to type into a field, to get the text from a field and to fix the useCellTable test. 
+
+##  22.2 What we need to know 
+
+  * Selenium 1.0 offers a whole bunch of commands for controlling the keyboard and sending text: 
+
+> .type, .typeKeys, .keyDown, .keyDownNative, .keyPress, .keyPressNative, .keyUp, .keyUpNative, .altKeyDown, .altKeyUp, .controlKeyDown, .controlKeyUp, .metaKeyDown, .metaKeyUp, .shiftKeyDown, .shiftKeyUp 
+
+  *     * Selenium 2.0 offers the above through Selenium emulation. 
+
+  * WebDriver offers .sendKeys on a WebElement
+
+    * WebDriver has a class called Keys which contains mappings for all the special keys we might require
+
+      * Keys.
+
+  * WebDriver triggers events so we don't need to 
+
+##  22.3 Changes to make 
+
+Start with the CanVisitSiteTests.java as we are going to try and enable the assert on useCellTable on the assumption that our fixes in the page object models are going to make this test work. 
+
+###  22.3.1 SideMenu.java 
+
+In SideMenu.java change the selectCellWidgetsCellTable to pass in driver: 
+    
+~~~~~~~~    
+    public CellTablePanel selectCellWidgetsCellTable() {
+    clickSubMenuItem("Cell Table");
+    return new CellTablePanel(driver);
+    }
+~~~~~~~~    
+    
+
+###  22.3.2 CellTablePanel.java 
+
+Go through the normal steps to incorporate driver into CellTablePanel 
+
+  * change constructor, remove selenium etc. 
+    
+~~~~~~~~    
+    	private WebDriver driver;
+...
+    	public CellTablePanel(WebDriver driver) {
+    		this.driver = driver;
+    	}
+~~~~~~~~
+
+  * amend the isPageTitleCorrect method in the normal way 
+    
+~~~~~~~~    
+    	public boolean isPageTitleCorrect() {
+    		return driver.getTitle().endsWith("Cell Table");
+    	}
+~~~~~~~~    
+
+####  22.3.2.1 getFirstNameOnRow 
+
+Instead of: 
+    
+~~~~~~~~    
+    return selenium.getText(firstName); 
+~~~~~~~~    
+
+Use the getText method on the WebElement and change the code to: 
+    
+~~~~~~~~    
+    public String getFirstNameOnRow(int i) {
+    	String rowXpath = 
+        "//table[@class=\"GALD-WOPD GALD-WOCH\"]/tbody/tr[" + i + "]";
+    	String firstName = rowXpath + "/td[2]/div";
+    	return driver.findElement(By.xpath(firstName)).getText();		
+    }
+~~~~~~~~    
+
+####  22.3.2.2 setFirstNameOnRow 
+
+For setFirstNameOnRow we need to find the element, click on it and sendKeys, so : 
+    
+~~~~~~~~    
+    selenium.click(firstName);
+    selenium.type(firstName + "/input", name);
+    selenium.fireEvent(firstName + "/input", "mouseout");
+~~~~~~~~    
+
+becomes: 
+    
+~~~~~~~~    
+    WebElement row = driver.findElement(By.xpath(firstName));
+    row.click();		
+    driver.findElement(By.xpath(firstName + "/input")).
+        sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME) + name + Keys.RETURN);
+~~~~~~~~    
+
+The above sendKeys statement might be more complicated than you expected. 
+
+You might have expected: 
+    
+~~~~~~~~    
+    driver.findElement(By.xpath(firstName + "/input")).
+        sendKeys(name + Keys.RETURN);
+~~~~~~~~    
+
+Certainly this simpler form was the first one I tried, and it works on Firefox 3.6. But on Firefox 4, the test moves too fast and the whole word in the text field does not get selected before sending in the new text to overwrite it, so we append the new text to the end of the old text. 
+
+Because WebDriver offers us the ability to send in a Shift+Home sequence using the chord method, we can force the text to be highlighted before we over type it. 
+
+code checked in as revision 21 
+
+Note that I elected to use a concatenation style when building the sendKeys string: 
+
+  * sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME) + name + Keys.RETURN); 
+
+I could have use a variable list of parameters 
+
+  * sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME) , name, Keys.RETURN); 
+
+Both styles should be equivalent so you get to choose which one to use in your code. 
+
+##  22.4 Warning Broken Suite 
+
+You may notice that the test only passes if it is run individualy. 
+
+It does not pass when run as part of the suite of tests. 
+
+I spent quite a lot of time investigating this. The test passes if run in a different order in the Suite - i.e. placed before navigateFromHyperLinkToRadioButton 
+
+I am tempted to assume an application error. But an application error that only shows up when running the test using automation. The application appears to not have the issue when run manually. 
+
+A re-ordered suite is presented in revision 23 
+
+This feels completely horrible and completely against the grain for testing. Were this an application I was working on I would be incredibly nervous about having to do this. 
+
+Because the aim of this tutorial is to provide an overview of Selenium I have fewer concerns. 
+
+But I don't know if this is: 
+
+  * a Selenium problem because of the way it triggers events 
+  * a problem in the application 
+  * a problem in the application that is only triggered by use of Selenium 
+  * a problem in my test script 
+
+If any reader finds the answer to this problem then please let me know and I'll update this text to accomodate the authorative answer. For now, I'm comfortable that we have explored WebDriver functionality. 
+
+This problem does not manifest on IE 8 on Windows XP so I have a suspicion that it is the test code. Hey, I'll cheat just now. 

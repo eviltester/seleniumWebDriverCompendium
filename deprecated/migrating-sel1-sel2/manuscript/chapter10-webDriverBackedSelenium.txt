@@ -1,0 +1,55 @@
+#  10 A Worked Example: WebDriverBackedSelenium 
+
+Our next step in the migration is to try the Selenium Emulation provided by WebDriverBackedSelenium 
+
+To use this we instantiate a WebDriver and wrap that driver in a WebDriverBackedSelenium instantiation and use that as a drop in replacement for Selenium in our existing test code. 
+
+##  10.1 What is a Driver? 
+
+A driver is a library that automates the web browser. 
+
+The Selenium 2.0 distribution contains a number of drivers e.g.: 
+
+  * FirefoxDriver 
+  * InternetExplorerDriver 
+  * ChromeDriver 
+  * HTMLUnitDriver 
+  * AndroidDriver 
+  * IPhoneDriver 
+
+Each driver implements different interfaces to expose its capabilities as all drivers and browser are not at the same level of implemented functionality yet. 
+
+WebDriver is the most generic of the interfaces and contains the most needed commands we will use as it "represents an idealised web browser".
+
+[http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/WebDriver.java](http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/WebDriver.java)
+
+We will initially use the FirefoxDriver in our tests. 
+
+##  10.2 What is WebDriverBackedSelenium? 
+
+Since we want to emulate Selenium we use the WebDriverBackedSelenium object to do this. 
+
+[http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/WebDriverBackedSelenium.java](http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/WebDriverBackedSelenium.java)
+
+WebDriverBackedSelenium wraps the driver and extends the DefaultSelenium object. 
+
+##  10.3 How do we use this? 
+
+  * Comment out the selenium connection and replace with our first WebDriver code. 
+  * Then pass the FirefoxDriver to the WebDriverBackedSelenium object which emulates the Selenium interface. 
+
+~~~~~~~~    
+    //  selenium = new DefaultSelenium("localhost",
+    //                                 4444, 
+    //                                 "*iexplore", 
+    //                                 "http://localhost/");
+    //  selenium.start();
+    
+    WebDriver driver = new FirefoxDriver();
+    selenium = new WebDriverBackedSelenium(driver,"http://localhost/"); 
+~~~~~~~~    
+
+Run the test they all fail. We will look at why, after we look at Driver Profiles. 
+
+This is checked in as Revision 6  
+I also removed all the commented out SeleniumServer code.

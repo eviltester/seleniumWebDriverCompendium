@@ -1,0 +1,692 @@
+#  3 Overview of Selenium 2.0 
+
+This section provides a reference style overview of Selenium 2.0 
+
+It concentrates on the Selenium 2.0 functionality you need to know to migrate the example tests in the code base. 
+
+It does not aim to provide a comprehensive overview of Selenium 2.0 and the WebDriver API. It provides just enough to get you started. 
+
+##  3.1 Selenium 1.0 and Selenium 2.0 Differences 
+
+- Selenium 1.0 
+- Selenium 2.0 
+
+- Selenium-RC Server 
+- Direct Browser Access 
+
+- Flat API 
+- Object API 
+
+- Well Documented 
+- Forums and Source Code 
+
+- Easy for beginners 
+- Better for experienced coders 
+
+##  3.2 WebDriver 
+
+The WebDriver is the main interface to use for your automation. 
+
+[http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/WebDriver.java](http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/WebDriver.java)
+
+All the 'physical' drivers: FirefoxDriver, InternetExplorerDriver etc. implement the WebDriver interface. 
+
+This provides a common set of methods for your automation. 
+
+![](images/originals/webDriverMethods.png)
+
+Figure 3.1 WebDriver Methods 2.0 release candidate 2 
+
+Note the methods which return more complex objects: 
+
+  * manage() 
+  * navigate() 
+  * switchTo() 
+
+These provide access to additional features such as cookies, alerts, window management etc. 
+
+Explore the API for yourself and although simple, it is very rich in functionality. 
+
+##  3.3 Drivers 
+
+The physical drivers themselves have additional functionality beyond that provided by WebDriver. 
+
+Explore the source code to learn the full scope of each driver and the nuances it provides. 
+
+You access different features of the driver by casting it in different ways. 
+
+e.g. 
+
+  * to access the JavaScript functionality cast the driver to JavaScriptExecutor
+
+    * JavascriptExecutor js = (JavascriptExecutor)driver; 
+
+  * to take screenshots, casts the driver to TakesScreenshot 
+
+###  3.3.1 Firefox Driver 
+
+[http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/firefox/FirefoxDriver.java](http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/firefox/FirefoxDriver.java)
+
+Firefox driver supports: 
+
+  * the creation of the driver with a profile. This provides an easy way of starting Firefox with Firebug and other tools that you might need to help you with your automation. 
+  * taking screenshots 
+
+####  3.3.1.1 FirefoxDriver Profiles 
+
+FirefoxProfile is a class well worth reading through. 
+
+[http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/firefox/FirefoxProfile.java](http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/firefox/FirefoxProfile.java)
+
+From the code you can see that using a FirefoxProfile you can: 
+
+  * add extensions 
+  * set preferences 
+  * set proxy settings 
+  * change the SSL certificate settings 
+  * etc. 
+
+An essential class for configuring Firefox as you require it for your testing. We cover this in more depth in the Worked example section. 
+
+###  3.3.2 Internet Explorer Driver 
+
+[http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/ie/InternetExplorerDriver.java](http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/ie/InternetExplorerDriver.java)
+
+At the time of writing the Internet Explorer Driver doesn't let you do much more than start the browser session, although it does support TakesScreenshot. 
+
+Over time this will change so read the source code, or pay attention to the code completion against the driver to see what features get added to the driver. 
+
+##  3.4 Page Navigation 
+
+Selenium 2.0 places no constraints on domains. With Selenium 1.0 each session was constrained to a single base domain, so if your application redirected you to a different domain, there was no way for you to automate that. 
+
+With Selenium 2.0 no such contraints exist. You control the browser so can jump around between domains as you need to. 
+
+###  3.4.1 With Selenium 1.0 
+
+Selenium allows us to open pages with: 
+    
+
+~~~~~~~~    
+    selenium.open(aURL);
+~~~~~~~~    
+
+Where the URL is a relative url to the base URL passed through to Selenium when we start the Selenium session. 
+
+e.g. 
+    
+~~~~~~~~    
+    selenium.open("Showcase.html");
+~~~~~~~~    
+
+###  3.4.2 With WebDriver 
+
+WebDriver automates the browser directly so has no concept of a base URL. 
+
+You can either: 
+
+  * use the WebDriver object and the .get method
+
+    * get(String anAbsoluteURL) 
+
+  * use the navigate() method to return a Navigation object and the methods from this 
+
+The Navigation object has two methods to go directly to a url: 
+
+~~~~~~~~
+  * to(String aURL) 
+  * to(URL aUrl) 
+~~~~~~~~
+
+e.g. 
+
+You can also simulate the back and forward browser buttons using the Navigation object with: 
+
+~~~~~~~~
+  * .back() 
+  * .forward() 
+~~~~~~~~
+
+####  3.4.2.1 Examples 
+
+~~~~~~~~
+  * driver.get("http://www.eviltester.com"); 
+  * driver.navigate.to("http://www.eviltester.com"); 
+  * driver.navigate.to(new URL("http://www.eviltester.com")); 
+~~~~~~~~
+
+##  3.5 Locator Strategies 
+
+WebDriver uses a lot of objects to make the API simple to store in your head, and organise. 
+
+So in Selenium 1.0 there were a lot of methods for 'doing stuff to the page'. Now, you find a WebElement on the page and use the methods that it exposes to automate the web application. 
+
+###  3.5.1 Finding 
+
+The two basic methods for locating a WebElement are: 
+
+  * FindElement
+
+    * which locates a single WebElement 
+
+  * FindElements
+
+    * which locates multiple WebElement(s) and returns them in a collection 
+
+###  3.5.2 By 
+
+The FindElement(s) methods take a By object as an argument. The By class implements the locator strategies we can use. 
+
+![](images/originals/byMethods.png)
+
+Figure 3.2 By Methods 
+
+The method names are simple enough to understand what they do so: 
+
+  * By.xpath
+
+    * allows you to find an element By using an XPATH 
+
+  * By.cssSelector
+
+    * allows you to find an element By using a CSS selector 
+
+  * etc. 
+
+###  3.5.3 Chaining 
+
+WebDriver allows us to chain location strategies in two ways: 
+
+  * findElement(By(x)).findElement(By(y))
+
+    * by having follow on findElement statements as a WebElement supports the findElement(s) methods 
+
+  * findElement(new ByChained(By(x),By(y)))
+
+    * by chaining the location strategies together 
+
+When chaining we can mix location strategies so could do: 
+
+  * findElement(By.xpath("//div[@id='bob']")).findElement(By.linkText("dobbs")) 
+
+We can make this as flexible as we need to for test readabilitya nd maintainability. 
+
+##  3.6 WebElement 
+
+If you only paid attention to two classes in WebDriver they would be WebDriver itself, and WebElement. 
+
+  * WebDriver represents the browser. 
+  * WebElement represents everything on the page. Every snippet of HTML. Every div. Every anchor. Every... well, HTML Element. 
+
+[http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/WebElement.java](http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/WebElement.java)
+
+Since the concept of a WebElement is pretty generic, the class will expose methods that will not be appropriate for some of the elements it represents. 
+
+So don't expect to be able to .submit something that is not in a form. Or .toggle a radio button. 
+
+![](images/originals/webElementMethods.png)
+
+Figure 3.3 WebElement Methods 
+
+Again the method names are self explanatory. 
+
+Note that a WebElement can go 'stale' if the DOM changes, so on each method call the WebElement checks if it is still in the DOM, in the same place, so you have to consider this in your automation. A StaleElementReferenceException will be thrown if this happens. 
+
+Note the methods which return more complex objects: 
+
+  * getSize() 
+  * getLocation() 
+
+allow you access to more attributes of the web element, you might need this for more complicated Ajax waits. 
+
+###  3.6.1 RadioButtons and Checkboxes 
+
+Some of the methods apply to certain types of Elements. I have pulled out the following few, simply because we use them in the Worked Example section. 
+
+  * .isSelected() 
+  * .setSelected 
+  * .toggle() 
+
+###  3.6.2 Rendered Web Element 
+
+RenderedWebElement was deprecated in Selenium 2.0 release candidate 2. 
+
+All the RenderedWebElement functionality moved into WebElement. 
+
+So if you were used to casting a WebElement into a RenderedWebElement to access the css style properties and sizes etc. You no longer have to. 
+
+##  3.7 Javascript 
+
+Selenium 1.0 had specific methods to allow us to mess with JavaScript. 
+
+WebDriver provides a whole class. We cast the driver to a JavascriptExecutor to access this functionallity. 
+
+A whole class which supports 2 methods: 
+
+  * isJavascriptEnabled() to allow us to check 
+  * executeScript to do some Javascript goodness 
+
+e.g. 
+
+
+~~~~~~~~    
+    JavascriptExecutor js = (JavascriptExecutor)driver; 
+    return (Boolean)js.executeScript("return 1!=-1;");
+~~~~~~~~    
+
+executeScript converts the return from the execution into an appropriate Java object. 
+
+##  3.8 Alerts, Frames and Windows 
+
+WebDriver has the concept of a TargetLocator object, which is returned from the switchTo() method. 
+
+Using this it is possible to gain access to: 
+
+  * current element in focus
+
+    * driver.switchTo().activeElement() 
+
+  * an Alert
+
+    * driver.switchTo().alert() 
+
+  * a frame, which is a WebDriver object returned by
+
+    * driver.switchTo().frame(...) 
+
+  * a window, which is a WebDriver object returned by
+
+    * driver.switchTo().window(String nameOrHandle) 
+
+In this migration we only need to deal with Alerts 
+
+###  3.8.1 JavaScript Alerts 
+
+In Selenium 1.0 we are used to checking if an alert is present and if so, evaluating its content. 
+    
+~~~~~~~~    
+    boolean alert = selenium.isAlertPresent();
+    if(alert){
+       ok_so_far = selenium.getAlert().contentEquals("Stop poking me!");
+    }
+~~~~~~~~    
+
+In Selenium 1.0 JavaScript alerts are 'handled' and so not visible during automated execution. 
+
+In Selenium 2.0 the JavaScripts are shown. Therefore we have to write code to switch to the Alert, as opposed to the page and then act on the Alert. 
+    
+~~~~~~~~    
+    Alert anAlert = driver.switchTo().alert()
+    
+    assertTrue(anAlert.getText().contentEquals("Stop poking me!"));
+
+    driver.switchTo().alert().accept();
+~~~~~~~~    
+
+The alert() method returns an Alert object. 
+
+  * accept
+
+    * press the OK button on the Alert 
+
+  * dismiss
+
+    * press the Cancel button on the Alert 
+
+  * getText
+
+    * returns the text in the Alert 
+
+  * sendKeys
+
+    * trigger keypresses when the Alert is displayed 
+
+If alert is not present then we will get a null pointer exception when trying to access it from switchTo, so if we wanted to, we could wrap this in an ExpectedCondition wait and check for the existence of an alert. 
+
+##  3.9 WebDriverBackedSelenium 
+
+[http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/WebDriverBackedSelenium.java](http://code.google.com/p/selenium/source/browse/trunk/java/client/src/org/openqa/selenium/WebDriverBackedSelenium.java)
+
+An emulation layer for the Selenium interface. 
+
+As you try and use it, and as you dive into the code for it, you will see that it is not a full emulation layer - primarily regarding the javascript methods of Selenium 1.0 (but if you were using those, you probably know how to get yourself out of any problematic situations). 
+
+It does a pretty good job of emulating most of the other functions. And the source code for this provides some interesting insight into how you might combine WebDriver and Selenium and Javascript to build automation workarounds. 
+
+You provide a base URL in the constructor for this, but it only really needs this for opening relative URLs. This allows you to drop down to WebDriverBackedSelenium for some targetted automation workarounds in low levels of your Page Object model. 
+
+##  3.10 Page Object Factory 
+
+###  3.10.1 Selenium 1.0 Style 
+
+With Selenium 1.0, your Page Objects would take the form of a class, with methods that "do stuff" to the page. This allows you to hide the Selenium calls in a layer of abstraction. 
+
+###  3.10.2 Selenium 2.0 Style 
+
+####  3.10.2.1 Using New Classes 
+
+The Selenium 2.0 codebase offers some new Classes and annotations to help build Page Objects. The main ones are described below. 
+
+  * @FindBy
+
+    * an annotation which we apply to WebElements to define how the WebElement can be found on the page 
+
+  * @CacheLookup
+
+    * an additional annotation which defines the WebElement as one which always has the same instance in the DOM, so once found, can be reused in the page object. Without this, the WebElement is 're-found' each time it is accessed. 
+
+  * How
+
+    * an Enum used as a parameter in the FindBy to define how to locate it 
+
+  * ElementLocatorFactory
+
+    * an Interface for a class which implements an ElementLocator from a createLocator method 
+    * AjaxElementLocatorFactory
+
+      * a factory class which returns an AjaxElementLocator as the ElementLocator, you can define a timeout to wait for the element to appear 
+
+    * DefaultElementLocatorFactory
+
+      * default implementation of a Locator Factory which returns a DefaultElementLocator 
+
+    * DefaultFieldDecorator
+
+      * creates a proxy to each of the annotated WebElements. You cannot cast a WebElement initialised using a PageFactory.initElements to a RenderedWebElement so if you want to use RenderedWebElement methods then you need to declare the element as a RenderedWebElement 
+
+  * ElementLocator
+
+    * an interface for a class which implements a findElement method returning a WebElement 
+    * DefaultElementLocator 
+    * AjaxElementLocator 
+
+  * PageFactory
+
+    * contains the static initElements methods used to instantiate the annotated WebElement fields 
+
+You can find the classes in the source code in: 
+
+  * org.openqa.selenium.support 
+  * org.openqa.selenium.support.pagefactory 
+  * org.openqa.selenium.support.pagefactory.internal 
+
+####  3.10.2.2 Basic Usage 
+
+To use these we: 
+
+  * Annotate WebElement(s) or RenderedWebElement(s) with @FindBy
+
+    * define the strategy for How to locate the element using the @FindBy parameters 
+    * e.g. @FindBy(how = How.XPATH, using="//table[@id='gwt-debug-cwFlexTable']/tbody") 
+
+  * Initialise the annotated WebElement(s) in the Page Object constructor using an ElementLocatorFactory and the PageFactory 
+    
+~~~~~~~~    
+    public FlexTablePanel(WebDriver driver) {
+      ElementLocatorFactory finder = new AjaxElementLocatorFactory(driver,10);
+      PageFactory.initElements(finder,this);
+      this.driver = driver;
+    }
+~~~~~~~~    
+
+####  3.10.2.3 @FindBy and How 
+
+Create Fields to represent the WebElements that your Page Object model uses e.g. buttons, text fields, etc. 
+    
+~~~~~~~~    
+    WebElement submitButton;
+~~~~~~~~    
+
+You cannot cast a WebElement instantiated with the PageFactory to a RenderedWebElement so if you want to use the RenderedWebElement methods then you need to declare the field as a RenderedWebElement. 
+
+Annotate the WebElement with @FindBy. And use the parameters to declare the mechanism for how to find the WebElement on the page. 
+    
+~~~~~~~~    
+    @FindBy(how = How.XPATH, using="//div[@id='submit']")
+    WebElement submitButton;
+~~~~~~~~    
+
+The above would find an element on the page using the xpath "//div[@id='submit']" and assign it to the submitButton field. 
+
+This is equivalent to: 
+    
+~~~~~~~~    
+    submitButton = driver.findElement(By.xpath("//div[@id='submit']"));
+~~~~~~~~    
+
+At the time of writing in version 2.0b3, the How Enum has the following values: 
+
+  * CLASS_NAME 
+  * CSS 
+  * ID 
+  * ID_OR_NAME 
+  * LINK_TEXT 
+  * NAME 
+  * PARTIAL_LINK_TEXT 
+  * TAG_NAME 
+  * XPATH 
+
+The value for each of these can be defined in the "using" parameter e.g.: 
+
+~~~~~~~~
+  * @FindBy(how = How.XPATH, using="//div[@id='submit']") 
+  * @FindBy(how = How.ID, using="submit") 
+~~~~~~~~
+
+Or you can be more explicit in the @FindBy definition and define the location strategy and locator in one statement: 
+
+~~~~~~~~
+  * @FindBy(xpath="//div[@id='submit']") 
+  * @FindBy(id="submit") 
+~~~~~~~~
+
+To support the above style, the FindBy interface has the following parameters: 
+
+  * id 
+  * name 
+  * className 
+  * css 
+  * tagName 
+  * linkText 
+  * partialLinkText 
+  * xpath 
+
+####  3.10.2.4 Chaining @FindBy 
+
+You can 'chain' @FindBy in the same what that you can 'chain' findElement statements. 
+
+So: 
+    
+~~~~~~~~    
+    WebElement submitLink =
+    				driver.findElement(By.className("buttons")).
+    					   findElement(By.linkText("submit"));
+~~~~~~~~    
+
+could become: 
+    
+~~~~~~~~    
+    @FindBy({@FindBy(className="buttons"), @FindBy(linkText="submit")})
+    WebElement submitLink;
+~~~~~~~~    
+
+####  3.10.2.5 PageFactory and ElementLocatorFactory 
+
+The annotations do not do anything on their own. 
+
+The PageFactory.initElements method has to be called for a page object in order to assign a proxy finder for each of the annotated WebElement(s) 
+
+The simplest form calls the PageFactory.initElements with the Object containing the @FindBy annotations. In the example below I am calling the initElements method in the Page Object constructor: 
+    
+~~~~~~~~    
+    public MyPageObject(WebDriver driver) {
+    	PageFactory.initElements(this);
+    	this.driver = driver;
+    }
+~~~~~~~~    
+
+The above would use the DefaultElementLocatorFactory and associated DefaultElementLocator to create proxies for all annotated WebDriver fields. 
+
+The DefaultElementLocator implements a findElement that uses a By object based on the annotation definition and honours the caching annotation @CacheLookup. This can speed up access to the locator or result in stale object references if the WebElement is not cacheable. 
+
+####  AjaxElementLocator and AjaxElementLocatorFactory 
+
+One element locator supplied in Selenium 2.0 is the AjaxElementLocator. Designed for use with Dynamic DOM elements created by JavaScript. These may not be present on the page when you try to find them, the application may still be in the process of creating them. So the AjaxElementLocator allows you to define a TimeOut to wait until the WebElement is present in the DOM. 
+
+You can create your own ElementLocator, based on the AjaxElementLocator and override the isElementUsable method to implement your applications definition of usable, e.g. it may have to be displayed, or be a certain height, or assigned a specific css class etc. etc. 
+
+In the example below, I use the AjaxElementLocatorFactory with a timeout out of 10 seconds to wait for each element. 
+    
+~~~~~~~~    
+    public MyPageObject(WebDriver driver) {
+      ElementLocatorFactory finder = new AjaxElementLocatorFactory(driver,10);
+      PageFactory.initElements(finder,this);
+      this.driver = driver;
+    }
+~~~~~~~~    
+    
+
+####  3.10.2.6 Custom Locator Factories 
+
+If you wanted to create your own locators: 
+
+  * possibly to wait for the element to be displayed 
+  * possibly to have more control over the location strategies 
+
+Then you create both a locator and a factory. 
+
+I have done this when I wanted to use the annotation approach to keep my Page Object classes simple, but I wanted to create them for components to they needed to be relative to some other component. 
+
+When I did this I created a factory that took an xpath my component would be relative to, and in the findElement method for my locator class I simply tagged the annotation locator on to the relative xpath in the factory. 
+
+This is a more advanced usage of factories than I intend to present in this migration guide. 
+
+You can find an exxample of a custom locator in this stackoverflow.com answer by Zloi Adun: 
+
+  * [http://stackoverflow.com/questions/3981498/selenium-page-object-reuse](http://stackoverflow.com/questions/3981498/selenium-page-object-reuse)
+
+###  3.10.3 Field Access Levels 
+
+Because PageFactory approach to Page Objects works at a field level. We have some choices open to us; 
+
+  * do we make our fields public and allow access from within tests 
+  * do we wrap our fields in Page Object Methods 
+
+I use the PageFactory approach to build Page Objects quickly. Since I'm doing it quickly I start by making my fields publicly accessible. 
+
+e.g. 
+
+~~~~~~~~    
+    @FindBy(id="submit")
+    Public WebElement submitButton;
+~~~~~~~~    
+
+Then in my test I can say 
+    
+~~~~~~~~    
+    submitButton.click();
+~~~~~~~~    
+
+I do this for expediency. And then I refactor later to have more contextual methods at the Page Object. With the annotated fields becoming private to the Page Object. 
+
+You have to think about what works best for you. 
+
+To some extent you have abstracted away the location details so your test is less vulnerable to changes in page structure than if you use findElement().click() style code directly in your test. 
+
+But by making the fields public you have tightly coupled the test to the physical element level of your page. You might want to introduce a more domain specific layer on top of this physical access layer. 
+
+##  3.11 WebDriverWait 
+
+The Selenium 2 code base offers a WebDriverWait class to allow the the Java developer to wait until some condition manifests before continuing with the test. This can be used in two ways: 
+
+  * An adhoc Wait 
+  * An architectural decision to build a contextual framework 
+
+WebDriverWait takes an object which implements the ExpectedCondition interface as a parameter. 
+
+A WebDriverWait 'swallows' NotFoundExceptions. 
+
+To Implement the ExpectedCondition interface have to override an 'apply' method. 
+
+Apply can return an Object or Boolean. If it returns an Object then null is treated as false and not null treated as true and ends the wait loop. 
+
+  * ExpectedCondition implements apply 
+  * Apply returns null or Boolean 
+  * wait.until stops when !null or true 
+
+###  3.11.1 WebDriverWait as an Adhoc Wait 
+    
+~~~~~~~~    
+  new WebDriverWait(driver, 10){}
+  .until(new ExpectedCondition(){
+    @Override
+    public Boolean apply(WebDriver driver) {
+               return driver.getTitle().
+                   startsWith(TITLE_OF_PAGE_STARTS_WITH_THIS);
+          }});
+~~~~~~~~
+    
+
+Here we have created a new WebDriverWait, which times out in 10 seconds if the Expected Condition is not met. 
+
+The ExpectedCondition is defined as an anonymous inner class where we have overriden the apply method to implement the check for the expected condition. 
+
+You can use it as an adhoc wait to create simple checks using the driver. 
+
+If you want to use anything more complicated then you have to make an architectural decision and build the wait into your abstraction layer. 
+
+###  3.11.2 WebDriverWait as an Architectural Decision as a local support class 
+
+We can choose to make the wait local to the page and create the classess within the page object itself. But I'm not going to cover that here. 
+
+See blog post for this... 
+
+###  3.11.3 WebDriverWait as an Architectural Decision to build an abstraction layer 
+    
+~~~~~~~~
+    WebDriverWait wait = new WebDriverWait(driver, 20);
+    MyExpectedCondition conditionMet = new MyExpectedCondition();
+    wait.until(conditionMet);
+~~~~~~~~
+
+An example ExpectedCondition, which implements the 'count' checking as shown in the previous Wait would look like: 
+    
+~~~~~~~~
+    import org.openqa.selenium.WebDriver;
+    import org.openqa.selenium.support.ui.ExpectedCondition;
+    
+    public class MyExpectedCondition implements ExpectedCondition{
+    
+    	int count =0;
+    	
+    	@Override
+    	public Boolean apply(WebDriver driver) {
+
+    		if(count==10)
+    			return true;
+    		
+    		count++;
+    		return false;
+    	}
+
+    }
+~~~~~~~~    
+
+###  3.11.4 Advantages to WebDriverWait 
+
+  * Because WebDriverWait 'swallows' NotFoundExceptions, when you use driver commands in the apply method you do not need a try catch block. 
+  * The calling code looks a lot cleaner 
+  * You have a cleaner Object hierarchy and can reuse the ExpectedConditions 
+  * Your waits can return Objects
+
+    * so I could return a WebElement in my wait e.g. wait.until(condition).click() 
+
+###  3.11.5 Disadvantages to WebDriverWait 
+
+  * You need to write more code 
+  * You need to think a little more about your abstraction layer (although this is probably a positive) 
+
+###  3.11.6 Summary 
+
+  * Wait is good for adhoc waits, when building tests or experimenting with automation 
+  * WebDriverWait is better for building robust abstraction layers and wrapping WebDriver calls 

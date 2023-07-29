@@ -1,0 +1,178 @@
+#  16 A Worked Example: Amend SideMenu.java 
+
+##  16.1 What we need to do 
+
+Perform a first pass through SideMenu.java to convert any local methods to use WebDriver, retaining selenium only to pass through to other objects in the Page Object hierarchy. 
+
+##  16.2 What we need to know 
+
+  * Instead of selenium.click:
+
+    * find the element (driver.findElement) and 
+    * use the click method on the found WebElement 
+
+  * Use the WebDriverWait rather than adhoc wait to convert waitForCondition 
+
+##  16.3 Changes to make 
+
+###  16.3.1 selenium.click in clickSubMenuItem 
+
+  * Need to amend clickSubMenuItem
+
+    * selenium.click(...) becomes
+
+      * A chained set of object method calls
+
+        * driver.findElement(By.xpath(...)).click() 
+
+    * FindElement -- 
+
+      * how we find a WebElement 
+      * By -- the mechanism By which we locate it 
+      * Click -- because we need to 
+
+Really just one method we are amending here to start with as all other methods delegate responsibility to some other class. 
+    
+~~~~~~~~    
+    private void clickSubMenuItem(String subMenuText) {
+      selenium.click("//div[@class=\"GALD-WOBF\" and .=\"" + 
+    subMenuText + "\"]");
+      selenium.waitForCondition("document.title.match(/" + 
+    subMenuText + "/);", "2000");
+    }
+~~~~~~~~    
+
+First amend the selenium.click to 
+    
+~~~~~~~~    
+    String subMenuLocator = "//div[@class=\"GALD-WOBF\" and .=\"" + 
+    subMenuText + "\"]"; 
+    driver.findElement(By.xpath(subMenuLocator)).click();
+~~~~~~~~    
+
+changes check in as revision 14 
+
+###  16.3.2 WebDriverWait 
+
+WebDriver has 2 waits. A generic Wait and a WebDriverWait. 
+
+WebDriverWait 'swallows' NotFoundExceptions. So is good to use for findElement and driver calls. 
+
+####  16.3.2.1 What I want to see 
+
+WebDriverWait makes code more readable, so I want to amend the following selenium line into something using WebDriver which is also more readable. 
+    
+~~~~~~~~    
+    selenium.waitForCondition(
+      "document.title.match(/" + subMenuText + "/);", "2000");
+~~~~~~~~    
+
+I want to see code that looks like this... 
+    
+~~~~~~~~    
+    wait.until(weCanSee.GWTTitleMatches(subMenuText));
+~~~~~~~~    
+
+  * weCanSee will be a factory that returns an object implementing ExpectedCondition 
+  * wait is a WebDriverWait 
+
+####  16.3.2.2 Create an ExpectedCondition Factory 
+
+I will use a factory to make the code more readable. Each factory method returns an object implementing the ExpectedCondition interface. 
+
+For expediency I create the ExpectedConditionFactory in the page object package although I might choose to refactor that out later. 
+    
+~~~~~~~~    
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import com.eviltester.gwtshowcase.pageObjects.
+        expectedConditions.JavascriptExpectedCondition;
+public class ExpectedConditionFactory {
+  public ExpectedCondition GWTTitleMatches(String subMenuText) {
+    return new JavascriptExpectedCondition(
+      "document.title.match(/" + subMenuText + "/);");
+  }
+}
+~~~~~~~~    
+
+####  16.3.2.3 Create a JavaScriptExpectedCondition 
+
+The JavaScriptExpectedCondition will cast the driver as a JavascriptExecutor which gives me access to the executeScript method. 
+    
+~~~~~~~~    
+    import org.openqa.selenium.JavascriptExecutor;
+    import org.openqa.selenium.WebDriver;
+    import org.openqa.selenium.support.ui.ExpectedCondition;
+...    
+    public class JavascriptExpectedCondition implements ExpectedCondition {
+...
+      private String thisScript;
+...
+      public JavascriptExpectedCondition(String javaScript) {
+        this.thisScript= javaScriptScript;
+      }
+...
+      @Override
+      public Boolean apply(WebDriver driver) {
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        return (Boolean)js.executeScript(thisScript);
+      }
+    }
+~~~~~~~~    
+
+####  16.3.2.4 Amend SideMenu.java 
+
+So clickSubMenuItem with the wait added looks like this 
+    
+~~~~~~~~    
+    private void clickSubMenuItem(String subMenuText) {
+      String subMenuLocator = "//div[@class=\"GALD-WOBF\" and .=\"" + 
+          subMenuText + "\"]"; 
+      driver.findElement(By.xpath(subMenuLocator)).click();
+...
+      wait.until(weCanSee.GWTTitleMatches(subMenuText));
+    }
+~~~~~~~~    
+
+and the constructor like this: 
+    
+~~~~~~~~    
+    private WebDriverWait wait;
+    private ExpectedConditionFactory weCanSee;
+...
+    public SideMenu(WebDriver driver) {
+      this.driver= driver;
+      this.selenium = new WebDriverBackedSelenium(driver,"http://localhost/");
+      widgets = new MenuHeading(selenium,"Widgets", "Checkbox");
+      listsAndMenus = new MenuHeading(selenium,"Lists and Menus", "List Box");
+      textInput = new MenuHeading(selenium,"Text Input", "Basic Text");
+      tables = new MenuHeading(selenium,"Tables", "Grid");
+      cellWidgets = new MenuHeading(selenium,"Cell Widgets", "Cell List");
+...
+      wait = new WebDriverWait(driver, 20); 
+      weCanSee = new ExpectedConditionFactory();
+    }
+~~~~~~~~
+
+This code checked in as revision 15 
+
+##  16.4 Do we even need to wait? 
+
+Additional Exercise: comment out some of the waits and see which are required, and which are not. 
+
+If I comment out the Waits in the tests, some of them are not required... at the moment, when I run it locally. 
+
+But what about remotely? 
+
+Will it run slower? 
+
+I leave the waits in because: 
+
+I know they help remove intermittency by making the test more robust 
+
+The style of coding we used makes the test very readable 
+
+For some sections we may not choose to make the waits explicit because Selenium 2 has implicit waits in the findElement and we can amend the timing of these with: 
+    
+~~~~~~~~    
+    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+~~~~~~~~    

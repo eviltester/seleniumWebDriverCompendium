@@ -1,0 +1,99 @@
+#  23 A Worked Example: BasicTextPanel 
+
+I hope you're excited. This is the last set of changes we have to make before we remove the Selenium emulation layer from the Page Objects. 
+
+##  23.1 What we need to do 
+
+BasicTestPanel was another class where I could not control the page effectively with Selenium 1.0. Again relating to the sending of keys to the application. 
+
+Se we need to migrate BasicTextPanel and we need to enable the assert in the useTextInput test. 
+
+##  23.2 What we need to know 
+
+  * send text to the application using the WebElement sendKeys method 
+  * get text from an element using the WebElement getText method 
+  * WebDriver fires events during the sendKeys so that we shouldn't have to 
+
+##  23.3 Changes to make 
+
+###  23.3.1 SideMenu.java 
+
+Amend the call to the BasicTextPanel constructor: 
+    
+~~~~~~~~    
+    public BasicTextPanel selectTextInputBasicText() {
+      clickSubMenuItem("Basic Text");
+      return new BasicTextPanel(driver); 
+    }
+~~~~~~~~    
+    
+
+Remove selenium from this class in the SideMenu constructor and remove the field definition. 
+
+###  23.3.2 BasicTextPanel.java 
+
+####  23.3.2.1 Amend the constructor 
+
+Amend the constructor to take WebDriver instead of Selenium 
+    
+~~~~~~~~    
+    	private WebDriver driver;
+...
+    	public BasicTextPanel(WebDriver driver) {
+    		this.driver = driver;
+    	}
+~~~~~~~~
+
+####  23.3.2.2 isPageTitleCorrect 
+
+Fix the pagetitle method in the normal way: 
+
+~~~~~~~~    
+    	public boolean isPageTitleCorrect() {
+    		return driver.getTitle().endsWith("Basic Text");
+    	}
+~~~~~~~~    
+
+####  23.3.2.3 getNormalTextBoxSelectedPosition 
+
+Find the element and getText of that element, so change: 
+    
+~~~~~~~~    
+    selectedText =
+       selenium.getText(
+          "//input[@id='gwt-debug-cwBasicText-textbox']/../../td[2]/div");
+~~~~~~~~    
+
+To a WebElement getText(): 
+    
+~~~~~~~~    
+    String textBox = 
+      "//input[@id='gwt-debug-cwBasicText-textbox']/../../td[2]/div";
+    selectedText = driver.findElement(By.xpath(textBox)).getText();
+~~~~~~~~    
+
+####  23.3.2.4 overTypeNormalTextBoxWith 
+
+Find the element and sendKeys to that element: 
+    
+~~~~~~~~    
+    public void overTypeNormalTextBoxWith(String textToType) {
+      selenium.type("gwt-debug-cwBasicText-textbox", textToType);
+      // TODO: can't get this working in Selenium 0.9
+    }
+~~~~~~~~    
+
+Changes to: 
+    
+~~~~~~~~    
+    public void overTypeNormalTextBoxWith(String textToType) {
+      driver.findElement(By.id("gwt-debug-cwBasicText-textbox"))
+                        .sendKeys(textToType);
+    }
+~~~~~~~~    
+
+Run the tests and we should be done. 
+
+Nothing is now using the Selenium 1.0 API Everything is using Selenium 2.0 
+
+code checked in at revision 22, remember 23 has the suite 'fix' 

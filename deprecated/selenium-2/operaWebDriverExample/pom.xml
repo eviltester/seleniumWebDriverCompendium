@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.seleniumsimplified.webdriver</groupId>
+    <artifactId>operawebdriver</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+
+    <name>operawebdriverExample</name>
+    <url>http://seleniumsimplified.com</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- Junit 4.11 needs hamcrest 1.3 -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-server</artifactId>
+            <version>2.34.0</version>
+        </dependency>
+
+        <!-- Opera Driver only works with version 12.x, not the current version -->
+
+        <dependency>
+            <groupId>com.opera</groupId>
+            <artifactId>operadriver</artifactId>
+            <version>1.3</version>
+            <exclusions>
+                <!-- changes to Selenium 2.46.0 mean that the operadriver
+                    now conflicts with Selenium WebDriver. I excluded the
+                    apache.commons commons-exec from operadriver to allow
+                    the driver to retain compatibility with webdriver
+                -->
+                <exclusion>
+                    <groupId> org.apache.commons</groupId>
+                    <artifactId>commons-exec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+
+</project>

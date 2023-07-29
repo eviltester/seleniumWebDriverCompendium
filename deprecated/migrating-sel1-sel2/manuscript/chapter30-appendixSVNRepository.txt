@@ -1,0 +1,33 @@
+# Appendix - The SVN Repository 
+
+Location: http://svn3.xp-dev.com/svn/migration/trunk 
+
+Revisions: 
+
+  1. Base revision opening the project 
+  2. The basic project running under Selenium 1.0, creating the server in the code 
+  3. Basic project running under Selenium 1.0 uses Selenium Server running on localhost 4444 - does not start up the Selenium server 
+  4. Introduce the Selenium 2.0 library and remove the Selenium 1.0 libraries - does not start up the Selenium server 
+  5. Add the Selenium 2.0 source library 
+  6. Added WebDriverBackedSelenium and Firefox 
+  7. Added a FirefoxProfile to the driver to startup firebug 
+  8. added support for configuring the version of firebug in use 
+  9. fixed SideMenu and MenuHeading with selenium.getTitle 
+  10. removed Selenium from tests and added driver to GWTShowcase 
+  11. removed stacktrace messages from Firefox profile loading and renamed @BeforeClass method 
+  12. First pass amendments to GWTShowcase with use of adhoc wait 
+  13. Second pass amendments to GWTShowcase to remove Selenium 
+  14. SideMenu changes to migrate away from selenium.click 
+  15. SideMenu changed to use WebDriverWait 
+  16. Amendments to BasicButtonPanel 
+  17. migrated RadioButtonsPanel and HyperLinksPanel over to WebDriver 
+  18. Migrated FlexTablePanel over to WebDriver 
+  19. migrated MenuHeading.java and remove fireEvent 
+  20. fixed problem with sub menu clicking on Firefox 3.6 
+  21. migrated CellTablePanel and fixed a test 
+  22. Migrated BasicTextPanel to use WebDriver 
+  23. re-ordered suite to allow useCellTable to pass in the suite 
+  24. support for multiple browsers and fixes for IE9 
+  25. amended FlexTablePanel to use PageFactory to create the Page Object 
+  26. using saucelabs to demonstrate RemoteWebDriver 
+  27. upgraded to Selenium 2.0 release candidate 2 and removed RenderedWebElement and Wait.class usage 

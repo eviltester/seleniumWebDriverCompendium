@@ -1,0 +1,161 @@
+#  17 A Worked Example: BasicButtonPanel 
+
+##  17.1 What we need to do 
+
+  * We can deal with BasicButtonPanel is a single pass as it is at the lowest level of the object hierarchy. 
+  * Amend SideMenu.java to construct BasicButtonPanel with WebDriver instead of Selenium. 
+  * BasicButtonPanel is constructed in SideMenu and HyperLinksPanel so we need to make changes in both classes. 
+
+##  17.2 What we need to know 
+
+Amend constructors to recieve WebDriver 
+
+How to handle alerts with driver.switchTo.alert() as covered in Part 1 
+
+##  17.3 Changes to make 
+
+  * Start with the SideMenu.java call 
+  * Inject WebDriver rather than Selenium 
+  * Change HyperLinksPanel at same time
+
+    * Same pattern as before, 
+    * split between selenium and driver 
+
+  * Handle Alerts with
+
+    * driver.switchTo().alert()
+
+      * .getText() 
+      * .dismiss() 
+
+###  17.3.1 SideMenu.java 
+
+Change the selectWidgetsBasicButton from 
+
+~~~~~~~~    
+    public BasicButtonPanel selectWidgetsBasicButton() {
+      clickSubMenuItem("Basic Button");
+      return new BasicButtonPanel(selenium); 
+    }
+~~~~~~~~    
+
+to 
+
+~~~~~~~~    
+    public BasicButtonPanel selectWidgetsBasicButton() {
+      clickSubMenuItem("Basic Button");
+      return new BasicButtonPanel(driver); 
+    }
+~~~~~~~~    
+
+We do not need to pass in the apphost because BasicButtonPanel is on the lowest level of the Object hierarchy so does not use the Selenium emulation layer. 
+
+After we amend the constructor on BasicButtonPanel we can see that we also need to amend the HyperLinksPanel.java because it also creates a BasicButtonPanel. We need to have selenium and WebDriver working in parallel in the HyperLinksPanel. 
+
+So amend the SideMenu.java call to HyperLinksPanel to use driver, we do need to pass in the apphost as we will use the Selenium emulation layer. 
+    
+~~~~~~~~    
+    public HyperLinksPanel selectWidgetsHyperlink() {
+      clickSubMenuItem("Hyperlink");
+      return new HyperLinksPanel(selenium); 
+    }
+~~~~~~~~    
+
+becomes 
+    
+~~~~~~~~    
+    public HyperLinksPanel selectWidgetsHyperlink() {
+      clickSubMenuItem("Hyperlink");
+      return new HyperLinksPanel(driver, apphost); 
+    }
+~~~~~~~~    
+
+###  17.3.2 HyperLinksPanel.java 
+
+Changing the constructor on BasicButtonPanel impacted HyperLinksPanel.java, such that we need to amend the HyperLinksPanel constructor and copy the driver/selenium code from SideMenu.java into HyperLinksPanel.java 
+    
+~~~~~~~~    
+    private Selenium selenium;
+    private WebDriver driver;
+...
+    public HyperLinksPanel(WebDriver driver, String apphost) {
+      this.driver = driver;
+      this.selenium = new WebDriverBackedSelenium(driver,apphost);
+    }
+~~~~~~~~
+
+Then amend the call to BasicButtonPanel to pass in the driver. 
+
+~~~~~~~~    
+    public BasicButtonPanel selectBasicButtonLink() {
+    selenium.click("gwt-debug-cwHyperlink-com.google.gwt.sample." +
+         "showcase.client.content.widgets.CwBasicButton");
+    return new BasicButtonPanel(driver);
+    }
+~~~~~~~~    
+
+###  17.3.3 BasicButtonPanel.java 
+
+####  17.3.3.1 Constructor 
+
+We need to change the constructor on BasicButtonPanel to take a driver 
+    
+~~~~~~~~    
+    private WebDriver driver;
+...
+    public BasicButtonPanel(WebDriver driver) {
+      this.driver = driver;
+    }
+~~~~~~~~
+
+####  17.3.3.2 isPageTitleCorrect 
+
+An easy fix on isPageTitleCorrect 
+    
+~~~~~~~~    
+    public boolean isPageTitleCorrect() {
+    return selenium.getTitle().endsWith("Basic Button");
+    }
+~~~~~~~~    
+
+becomes 
+    
+~~~~~~~~    
+    public boolean isPageTitleCorrect() {
+    return driver.getTitle().endsWith("Basic Button");
+    }
+~~~~~~~~    
+
+####  17.3.3.3 clickNormalButtonAndExpectPopUp 
+
+The selenium.click is easy, as we have converted this before so: 
+    
+~~~~~~~~    
+    selenium.click("gwt-debug-cwBasicButton-normal");
+~~~~~~~~    
+
+becomes a findElement statement but this time using a By.id locator: 
+    
+~~~~~~~~    
+    driver.findElement(By.id("gwt-debug-cwBasicButton-normal"));
+~~~~~~~~    
+
+For handling Alerts we will use the switchTo() explained in part 1 
+
+  * I could wrap the driver.switchTo().alert() in a wait ExpectedCondition -- just in case the alert took time to appear. But I'm just going to assume that the alert does exist and check that the text is what we expect 
+  * I also have to dismiss the alert. In Selenium 1.0 alerts never appeared so you didn't really have to 'handle' them. 
+  * In Selenium 2.0 they do appear so you can get the Text but you also have to 'handle' it by accepting/dismissing it.
+
+    * in this case we 'accept' the Alert by clicking on [OK] 
+
+So the alert functionality becomes 
+    
+~~~~~~~~    
+    Boolean alertTextOK;
+    alertTextOK = driver.switchTo().alert().getText().contentEquals(
+                      "Stop poking me!");
+    driver.switchTo().alert().accept();
+    return alertTextOK;
+~~~~~~~~    
+
+Code checked in as revision 16 

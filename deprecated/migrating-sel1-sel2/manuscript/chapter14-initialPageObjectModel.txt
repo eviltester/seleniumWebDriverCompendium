@@ -1,0 +1,90 @@
+#  14 A Worked Example: Initial Page Object Model Amendments to GWTShowcase 
+
+##  14.1 What we need to do 
+
+Since GWTShowcase is the main Object in the Page Object hierarchy we will start with that. 
+
+We can migrate Selenium out of this class using a two pass process: 
+
+  1. amend all the local methods and check the test still works 
+  2. remove selenium from the class and migrate it through to the lower level classes 
+
+I split it into two passes so that I make enough changes to make progress, but not too many that interfere with my ability to see if I have broken anything. 
+
+This chapter will deal with the first pass and involves: 
+
+  * changing the open method to use an adhoc Wait check the driver.getTitle instead of the waitForCondition 
+  * amending getPageTitle to use the driver getTitle method instead of the Selenium method 
+  * at the end of this pass through Selenium is only retained for passing through to sideMenu 
+
+##  14.2 What you need to know 
+
+To make the changes you need to know: 
+
+  * The adhoc Wait class presented in part one 
+  * WebDriver page navigation to open a page as presented in part one 
+  * WebDriver has a getTitle method the same as Selenium 
+
+##  14.3 Changes To Make 
+
+###  14.3.1 Open the page with the full url in the open() method 
+
+Open pages with WebDriver with driver.get(...) or driver.navigate.to(...) 
+
+e.g. 
+
+~~~~~~~~    
+    public void open() {
+      driver.get(apphost + "Showcase.html");
+~~~~~~~~    
+
+As an exercise in experimentation you might want to try all the options and see which you prefer. I have chosen to use the .get method on driver. 
+
+###  14.3.2 Change the wait condition in the open() method 
+
+This is the first time we are using a WebDriver wait so I will use the adhoc wait condition explained in part 1. 
+
+I need to remove selenium.waitForCondition 
+
+Need to amend GWTShowcase to use driver and illustrate the wait pattern. 
+    
+~~~~~~~~    
+    // ajax page so wait for it to load
+    selenium.waitForCondition("document.title.match(/" + 
+    TITLE_OF_SHOWCASEPAGE_STARTSWITH + "/);", "2000");
+    assertTrue("wrong title", getPageTitle().startsWith(
+        TITLE_OF_SHOWCASEPAGE_STARTSWITH));
+~~~~~~~~    
+
+becomes 
+
+~~~~~~~~    
+    new Wait("Page Did Not Load"){
+      @Override
+      public boolean until() { 
+        try{
+          return driver.getTitle().startsWith(
+              TITLE_OF_SHOWCASEPAGE_STARTSWITH);
+        }catch(Exception e){
+          // ignore not found exceptions 
+        };
+        return false;
+      }
+    };
+~~~~~~~~    
+
+As an exercise, experiment with the different forms of the Wait code to see which you prefer. 
+
+Note that I also removed the assertTrue as the wait throws an exception on timeout if the title did not match what we expected 
+
+###  14.3.3 change the getPageTitle() method 
+    
+~~~~~~~~    
+    public String getPageTitle(){
+      return driver.getTitle();
+    }
+~~~~~~~~    
+
+Since WebDriver has a getTitle method equivalent to the Selenium getTitle method, I just use driver in place of selenium. 
+
+This code checked in as revision 12 

@@ -1,0 +1,106 @@
+#  25 Page Object Models 2.0 
+
+##  25.1 What we need to do 
+
+  * Migrate FlexTablePanel over to using the PageFactory approach to creating a Page Object 
+
+##  25.2 What we need to know 
+
+  * Annotate WebElements with @FindBy 
+  * Initialise the elements using a PageFactory.initElements method 
+  * Use the AjaxElementLocatorFactory 
+
+##  25.3 Changes to make 
+
+  * @FindBy(how = How.XPATH, using="//table[@id='gwt-debug-cwFlexTable']/tbody") 
+
+I chose to use the FlexTablePanel.java Page Object as that is a pretty simple Page Object to start with. 
+
+Amend the constructor to initialise any annotated WebElement(s) using an AjaxElementLocatorFactory: 
+    
+~~~~~~~~    
+  public FlexTablePanel(WebDriver driver) {
+    ElementLocatorFactory finder = new AjaxElementLocatorFactory(driver,10);
+    PageFactory.initElements(finder,this);
+    this.driver = driver;
+  }
+~~~~~~~~    
+
+This will iterate over all the WebElement fields annotated with @FindBy 
+
+We will add some to use in the Page Object methods. 
+
+Instead of 
+    
+~~~~~~~~    
+  public void removeRow(){
+    driver.findElement(
+       By.xpath(
+           "//td[@id='gwt-debug-cwFlexTable-0-1']//button[.='Remove a row']"))
+         .click();
+  }
+~~~~~~~~    
+
+we could have 
+    
+~~~~~~~~    
+    public void removeRow(){
+      removeRowButton.click();
+    }
+~~~~~~~~    
+
+if we create a removeRowButton WebElement and annotate it 
+    
+~~~~~~~~    
+  @FindBy(xpath=
+      "//td[@id='gwt-debug-cwFlexTable-0-1']//button[.='Remove a row']")
+  private WebElement removeRowButton;
+~~~~~~~~    
+
+same for 
+    
+~~~~~~~~    
+public void addRow(){
+driver.findElement(
+  By.xpath(
+    "//td[@id='gwt-debug-cwFlexTable-0-1']//button[.='Add a row']")).
+        click();
+}
+~~~~~~~~    
+
+change to 
+    
+~~~~~~~~    
+    public void addRow(){
+    addRowButton.click();
+    }
+~~~~~~~~    
+
+and 
+    
+~~~~~~~~    
+    @FindBy(xpath=
+        "//td[@id='gwt-debug-cwFlexTable-0-1']//button[.='Add a row']")
+    private WebElement addRowButton;
+~~~~~~~~    
+
+then we can tidy up getNumberOfRows 
+    
+~~~~~~~~    
+    public int getNumberOfRows() {
+      return flexTable.findElements(By.xpath("tr")).size()-1;
+    }
+~~~~~~~~    
+
+and 
+    
+~~~~~~~~    
+    @FindBy(xpath="//table[@id='gwt-debug-cwFlexTable']/tbody")
+    private WebElement flexTable;
+~~~~~~~~    
+
+Here we can see that findElements can be chained off the back of other WebElements to make selections easier 
+
+Run the tests and this change has had no impact. 
+
+code checked in at revision 25 

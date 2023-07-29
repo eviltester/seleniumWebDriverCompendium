@@ -1,0 +1,13 @@
+#  2 Overview of Selenium 1.0 Idioms 
+
+Basically a summary of the code that we wrote in Selenium 1.0 
+
+##  2.1 Client 
+
+##  2.2 Server 
+
+##  2.3 Flat API 
+
+##  2.4 JavaScript Waits 
+
+##  2.5 Page Objects 

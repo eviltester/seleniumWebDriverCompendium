@@ -1,0 +1,60 @@
+#  4 Migration Strategies 
+
+This chapter provides an overview of the main migration strategies that you are likely to use. If you think of others then please let the author of this text know. 
+
+##  4.1 Introduction 
+
+When approaching the migration of a set of tests from Selenium 1.0 I think there are 3 main approaches that people will think of: 
+
+  * Drop in replacement for Selenium 1.0 
+  * Selenium Emulation 
+  * Conversion to WebDriver 
+
+Given the advertising behind Selenium 2.0 regarding backwards compatibility, and simply in terms of degrees of non-invasiveness I have listed them in the order I think that most people will try. 
+
+Of course, that depends on your automation setup. 
+
+You may also find that your automated setup presents you with some challenges that interfere with a migration process and you may have to remove some of those before you start. 
+
+For example, if you have been running your tests in parallel with multiple Selenium sessions running on the same server, you probably want to remove this capability while migrating. 
+
+Ideally you want as simple as possible a Selenium setup when you migrate so that you remove issues related to the actual automation code, before tackling the automation architecture. 
+
+However, if the architecture you have e.g. tests running in parallel on multiple machines. Is vital to your automation success then do not dive straight into a migration. 
+
+First do an evaluation of Selenium 2.0 to make sure that you can tailor it architecturally to your automation needs. This can probably be done without knowing much about WebDriver itself. 
+
+Do not go through the whole process of migrating all your tests, only to discover that you do not know how to solve some of the architectural constraints you have placed on yourself. 
+
+If Selenium 1.0 is working for you. And you can not get a Selenium 2.0 technical setup working. Then it may not be time for you to migrate yet. 
+
+##  4.2 Drop in replacement for Selenium 1.0 
+
+The Selenium 2.0 jar can operate the same way as the Selenium 1.0 server. So by starting it with: 
+
+java -jar selenium2rc.jar 
+
+You should be able to connect with your existing code and client. If your client doesn't work, try upgrading to the new Selenium 2.0 clients. 
+
+If this works then it is the simplest way of upgrading. 
+
+You won't have migrated over to any of the WebDriver nuances, but you immediately have the capability of incorporating the WebDriver nuances and styles into your automation code over time. 
+
+##  4.3 Selenium Emulation 
+
+Selenium 2.0 provides a WebDriverBackedSelenium class to allow you to instantiate a DefaultSelenium object that uses WebDriver instead of the Selenium server. 
+
+If this works for your tests then you can move away from the Selenium server approach and start using the WebDriver concepts. If you want to retain the Selenium server benefits of running tests on other machines then you can move over to the RemoteWebDriver instead of a local WebDriver. 
+
+##  4.4 Conversion 
+
+A controlled migration over to WebDriver concepts and nuances. 
+
+  * Migrate to WebDriver from highest level of abstraction 
+  * Promote driver to same level as Selenium
+
+    * Push Selenium Emulation ever lower in the abstraction stack 
+    * Finish when Selenium Emulation no longer used 
+    * Aim to keep all tests running at all times 
+
+In this process the WebDriverBackedSelenium is likely to be used to enable you to employ workarounds in your automation rather than as a main part of your automation strategy. 

@@ -1,0 +1,126 @@
+#  7 A Worked Example Overview of the Selenium 1.0 Tests 
+
+Overview of the Selenium 1.0 version of the project at revision 3 in the repository. 
+
+  * Page Objects 
+  * Refactored to remove common code 
+  * No thread.sleep used 
+  * Sync on 'do' not on 'check' 
+  * Positional xpath e.g.`//div/../div`
+  * Start Selenium Server from test code 
+  * Start lightweight app server from test code 
+  * Properties from property file 
+  * Selenium 1.0 requires execute Javascript methods to sync e.g. GWTShowcase.java 
+  * Some tests we couldn't get working using Selenium 1.0 
+
+
+##  7.1 CanVisitSiteTests.java 
+
+  * A Single Class "CanVisitSiteTests.java" with all our tests in them 
+  * @BeforeClass annotated startSelenium method does a lot of work for us:
+
+    * reads in property file to get our basic configuration items 
+    * starts the selenium server in the code for us 
+    * if configured to, it starts our local app server
+
+      * we are using the open-source Java Mini Web Server from jibble.com
+
+        * SimpleWebServer.jar 
+        * http://www.jibble.org/miniwebserver/ 
+        * Embedding it into our source code like this means that we can configure the port it runs against 
+        * At only 7.5k (including bundled source) it doesn't add much weight to our build process 
+
+    * We start a Selenium session with the browser and apphost defined in the properties file 
+
+  * All tests start by instantiating a GWTShowcase object and passing in the Selenium session as an argument
+
+    * GWTShowcase is the main class in our Page Object Model and everything else comes from that 
+    * Because the tests use a Page Object Model they are pretty readable 
+
+  * Some of the tests do not run as intended
+
+    * useTextInput and useCellTable have not been completed because of some automation issues we encountered with the version of Selenium we are using 
+
+  * We have an @AfterClass annotated method called stopSeleniumServer which closes our session and stops the server 
+
+##  7.2 Page Object Model 
+
+  * 'Partial' page object simply means that it could be better refactored, but we chose to split the GUI into chunks which we can automate. 
+  * No Thread.sleep has been used in any of the page objects, it uses a heavy reliance on selenium's waitForCondition e.g. in MenuHeading.java which waits for a JavaScript function to return true with a timeout associated. We also use the JavaScript selenium object in the waitForCondition. 
+  * Synchronisation is done on the 'do' methods, i.e. we don't sync when about to do a check, we wait until an action is complete before moving on. This makes for a very robust set of tests but can rule out some test situations, e.g. clicking before a certain state is reached. But since the main outcome of those situations is to break the test scripts we have allowed that. 
+  * Relative divs are used which chain back up the path, e.g. Openclose in MenuHeading.java 
+
+##  7.3 Properties File 
+
+We do configuration of the tests from a properties file: 
+    
+~~~~~~~~
+    browser = *iexplore
+    useLocalAppServer = yes
+    apphost = http://localhost:8088/
+    localAppServerPort = 8088
+~~~~~~~~
+
+
+  * use Internet Explorer as the browser 
+  * start up the local application server contained in `/demoSite`
+  * find the application under test on the url http://localhost:8088 
+  * configure the application server to start on port 8088 
+
+##  7.4 Build File 
+
+The Ant build file build.xml has the following targets 
+
+  * clean 
+
+    * (or cleanall) which deletes the bin directory 
+
+  * init 
+
+    * which copies any additional files required for the build into the bin directory 
+
+  * build 
+
+    * which compiles the java code 
+
+  * runtests 
+
+    * which runs the tests 
+
+  * junitreport 
+
+    * which collates the junit reports 
+
+  * test 
+
+    * which runs the tests and collates the junit reports 
+
+Because of dependencies in the build.xml file starting a build from scratch which runs the tests would be triggered by running: 
+
+`> ant clean test`
+
+For general running of the tests we can just type 
+
+`> ant test`
+
+##  7.5 Libraries Referenced 
+
+The Selenium 1.0 version of the project uses the following libraries, these are on the build path and in the `\libs` folder: 
+
+  * junit-4.9b2.jar
+
+    * JUnit used to run the tests 
+
+  * selenium-java-client-driver.jar
+
+    * The java client used to connect to Selenium-RC 
+
+  * selenium-server.jar
+
+    * This is version 0.9 of the Selenium server 
+
+  * SimpleWebServerFull.jar
+
+    * A small open-source web server used for running the GWT application locally when developing the tests 
+
+This is checked in as Revision 2 

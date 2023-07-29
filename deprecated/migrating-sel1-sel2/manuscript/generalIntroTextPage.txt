@@ -1,0 +1,18 @@
+Migrating from Selenium-RC to WebDriver
+
+  
+
+
+A Java Self Study Guide
+
+  
+
+
+Alan Richardson
+
+  
+
+
+[www.eviltester.com](http://www.eviltester.com/)
+
+[www.compendiumdev.co.uk](http://www.compendiumdev.co.uk/)

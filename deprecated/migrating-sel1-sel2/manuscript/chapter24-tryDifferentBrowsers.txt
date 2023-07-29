@@ -1,0 +1,228 @@
+#  24 Beyond the Basics: Try Different Browsers 
+
+##  24.1 What we need to know 
+
+Selenium 1.0 allows us to control the browser in use by changing the text string that we send to the server when we create a session 
+    
+~~~~~~~~    
+    new DefaultSelenium("localhost", 4444, "*iexplore", 
+                    "http://www.eviltester.com/");
+~~~~~~~~    
+
+With WebDriver we instantiate the driver that we require. So in order to have configurable browsers we need some conditional login in our test code to create a different driver for each text string. I will do this by introducing the concept of a DriverFactory. 
+
+##  24.2 What we need to do 
+
+Since all WebDrivers support the WebDriver, my DriverFactory simply needs a method called getDriver which returns a WebDriver, and the DriverFactory instantiates the return object with the correct Driver. 
+
+I moved all the 'support' code for creating the FirefoxDriver out of the test class CanVisitSiteTests.java and into the DriverFactory. 
+
+##  24.3 Changes to make 
+
+###  24.3.1 CanVisitSiteTests.java 
+    
+~~~~~~~~    
+    driver = DriverFactory.getDriver(browser);
+~~~~~~~~    
+
+Removed all the support code around the creation of the FirefoxDriver. 
+
+##  24.4 DriverFactory.java 
+
+I created DriverFactory.java in com.eviltester.gwtshowcase.drivers; 
+    
+~~~~~~~~
+    package com.eviltester.gwtshowcase.drivers;
+...
+    import java.io.File;
+    import java.io.FileInputStream;
+    import java.io.FileNotFoundException;
+    import java.io.IOException;
+    import java.util.Properties;
+...
+    import org.openqa.selenium.WebDriver;
+    import org.openqa.selenium.chrome.ChromeDriver;
+    import org.openqa.selenium.firefox.FirefoxDriver;
+    import org.openqa.selenium.firefox.FirefoxProfile;
+    import org.openqa.selenium.ie.InternetExplorerDriver;
+...
+    public class DriverFactory {
+...
+    	public static WebDriver getDriver(String browserCode) {
+    		if(browserCode.contentEquals("*firefox")){
+    			return getFirefoxDriver();
+    		}
+    		if(browserCode.contentEquals("*iexplore")){
+    			return new InternetExplorerDriver();
+    		}			
+    		if(browserCode.contentEquals("*googlechrome")){
+    			return new ChromeDriver();
+    		}			
+    		return null;
+    	}
+...
+    	private static WebDriver getFirefoxDriver() {
+    		String firebugVersion = getFirebugVersion();
+    		
+    	    String extensionPath = 
+                "./firefoxExtensions/firebug-" + firebugVersion + ".xpi";
+    	    FirefoxProfile profile = new FirefoxProfile();
+    		profile.setPreference("extensions.firebug.currentVersion", 
+                firebugVersion);
+    		profile.enableNativeEvents();
+    		try {
+    			profile.addExtension(new File(extensionPath));
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+    		
+    		return new FirefoxDriver(profile);
+    	}
+...
+    	private static String getFirebugVersion() {
+    		Properties props;
+    		props = new Properties();
+    		String propertyFile = "firefox.properties";
+    		
+    		try {
+    			props.load(new FileInputStream("./" + propertyFile));
+    		} catch (FileNotFoundException e) {
+    			System.out.println("No Firefox Properties file found");
+    		} catch (IOException e) {
+    			System.out.println("Error loading Firefox properties file");
+    		}
+    		 
+    		return props.getProperty("firebugversion","1.7.1");
+    	}	
+    }
+~~~~~~~~
+    
+
+In order to run the tests on different browsers, I change the browsercode in migrationTest.properties 
+
+##  24.5 What I learned 
+
+###  24.5.1 FireFox & IE8 
+
+The actual tests that we have function well on Firefox and IE 8. 
+
+###  24.5.2 IE9 
+
+On IE 9, the application itself does not work. So I amended the application (ShowCase.html) to have a meta tag in the header which tells IE9 to emulate IE7. 
+
+  * from http://msdn.microsoft.com/en-us/library/cc288325%28v=vs.85%29.aspx 
+  * IE 9 had issues where clicking on a link and showing the new panel and title was slower than the test expected so I have to add a wait into: 
+
+HyperLinksPanel.java selectRadioButtonLink 
+    
+~~~~~~~~    
+    public RadioButtonsPanel selectRadioButtonLink() {
+    	String elementID =
+                  "gwt-debug-cwHyperlink-com.google.gwt.sample" +
+                  ".showcase.client.content.widgets.CwRadioButton";
+
+    	driver.findElement(By.id(elementID)).click();
+    	final RadioButtonsPanel newPanel = new RadioButtonsPanel(driver);
+
+    	new Wait("wait for title to change"){
+    		@Override
+    		public boolean until() {
+    			return newPanel.isPageTitleCorrect();
+    		}
+    	};
+
+    	return newPanel;
+    }
+~~~~~~~~    
+
+I used the same pattern on selectBasicButtonLink. 
+    
+~~~~~~~~    
+    public BasicButtonPanel selectBasicButtonLink() {
+    	String elementID = 
+    			"gwt-debug-cwHyperlink-com.google.gwt.sample" +
+    			".showcase.client.content.widgets.CwBasicButton";
+    	driver.findElement(By.id(elementID)).click();
+    	final BasicButtonPanel newPanel = new BasicButtonPanel(driver);
+
+    	new Wait("wait for title to change"){
+    		@Override
+    		public boolean until() {
+    			return newPanel.isPageTitleCorrect();
+    		}
+    	};
+
+    	return newPanel;		
+    }
+~~~~~~~~    
+
+I should really create a GWTPanel object or interface with an isPageTitleCorrect method to allow me to refactor this code. 
+
+The alert functionality in Selenium 2 beta 3 does not seem to work well on IE9 so the BasicButtonPanel.java clickNormalButtonAndExpectPopUp getText 
+
+I also found I had to change some of the xpath locators I was using to css locators and I had to stop using \" when constructing the xpath strings and use ' 
+
+MenuHeading.java 
+    
+~~~~~~~~    
+public boolean isOpen(){
+By childDiv = 
+	By.xpath("//div[@class='GALD-WOBF' and .='" + 
+            this.firstMenuItemName + "']");
+	return(elementFound(childDiv));			
+}
+
+public void openClose() {
+	WebDriverWait wait = new WebDriverWait(driver,20);
+	ExpectedConditionFactory weCanSee = new ExpectedConditionFactory();
+	
+	String menuImage = "//div[.='"+ this.menuHeading + "']/../div/img";
+	driver.findElement(By.xpath(menuImage)).click();
+	
+	By parentDiv = By.xpath("//div[.='"+ 
+            this.menuHeading + "']/../../..");
+	wait.until(weCanSee.elementStopsGrowing(parentDiv,driver));
+}
+~~~~~~~~    
+
+and SideMenu.java 
+    
+~~~~~~~~    
+private void clickSubMenuItem(String subMenuText) {
+	String xpathExpression = 
+            "//div[@class='GALD-WOBF' and .='" + 
+                subMenuText + "']";
+	driver.findElement(By.xpath(xpathExpression)).click();
+	wait.until(weCanSee.GWTTitleMatches(subMenuText));
+}
+~~~~~~~~
+    
+
+This improved inconsistency a little, but not completely. 
+
+This also shows that refactoring to remove common locators would be a useful strategy. 
+
+I also found that with IE9 WebDriver did not handle the alert correctly and did not return the correct text from getTitle so I moved the useBasicButtons test to the bottom of the suite so as not to affect other tests. 
+
+I found that by I could remove intermittency in the IE9 tests by removing some redundancy from the tests so I finally refactored the tests to open the application in the @BeforeClass method, rather than in each test. 
+    
+~~~~~~~~    
+    private static GWTShowcase showcase;
+
+    @BeforeClass
+    public static void startDriver(){
+    	// code removed
+    	driver = DriverFactory.getDriver(browser);
+    		
+    	showcase = new GWTShowcase(driver,apphost);
+    	showcase.open();
+    }
+~~~~~~~~    
+
+After all that work, the tests still have some intermittency in them. for my purpose (illustrating a migration), I consider that good enough. You might want to investigate to make them super tight. I'm pretty sure that because of the number of different configurations out there. I could spend a lot of time on this, and they will still be intermittent on someone's machine. 
+
+###  24.5.3 GoogleChrome 
+
+Chrome seems to have timing issues and the tests don't work on Chrome. I don't know if this is the tests or the driver. I left *googlechrome support in the code, even though I know the tests don't run on Chrome. For the purposes of this tutorial, I don't really mind about this as I planned to focus on IE and Firefox. 
+
+code checked in at revision 24 

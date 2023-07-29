@@ -1,0 +1,116 @@
+#  12 A Worked Example: I thought Selenium 2.0 was backwards compatible 
+
+It is, but... an emulation layer has been used, and it isn't fully compatible yet. 
+
+We used "selenium." in our waitForCondition and we are not running selenium as a server we are using webDriverBackedSelenium there fore the selenium object we relied on is no longer present. 
+
+In the selenium emulation layer there is a compoundMutator object which will pull in common parts of Selenium JavaScript into the script sent to the browser, but getTitle has not been emulated in the mutator, so we have to change this line of JavaScript to avoid use of selenium.getTitle 
+
+For more information see [http://www.google.com/codesearch/p?hl=en#2tHw6m3DZzo/trunk/java/client/src/org/openqa/selenium/internal/seleniumemulation/CompoundMutator.java&q=mutator%20isElementPresent&sa=N&cd=2&ct=rc](http://www.google.com/codesearch/p?hl=en#2tHw6m3DZzo/trunk/java/client/src/org/openqa/selenium/internal/seleniumemulation/CompoundMutator.java&q=mutator%20isElementPresent&sa=N&cd=2&ct=rc)
+
+Other parts of our code use selenium.isElementPresent but this is emulated in the mutator so I don't expect the waitForCondition statements using this to have a problem. 
+
+##  12.1 Amend GWTShowcase.java 
+
+In GWTShowcase.java we change 
+
+~~~~~~~~    
+selenium.waitForCondition(
+      "var waitvalue = selenium.getTitle(); waitvalue.match(/" +
+      TITLE_OF_SHOWCASEPAGE_STARTSWITH + "/);", "2000");
+~~~~~~~~    
+
+to become: 
+    
+~~~~~~~~
+    selenium.waitForCondition(
+      "var waitvalue = document.title; waitvalue.match(/" + 
+      TITLE_OF_SHOWCASEPAGE_STARTSWITH + "/);", "2000");
+~~~~~~~~    
+
+or optimised to: 
+
+~~~~~~~~    
+selenium.waitForCondition(
+    "document.title.match(/" + TITLE_OF_SHOWCASEPAGE_STARTSWITH 
+    + "/);", "2000");
+~~~~~~~~    
+
+Run tests and see additional changes required. 
+
+##  12.2 Amend SideMenu.java 
+
+The same change required in SideMenu.java clickSubMenuItem. 
+
+~~~~~~~~    
+  private void clickSubMenuItem(String subMenuText) {
+    selenium.click("//div[@class=\"GALD-WOBF\" and .=\"" 
+    + subMenuText + "\"]");
+    selenium.waitForCondition(
+      "var waitvalue = document.title; waitvalue.match(/" + 
+          subMenuText + "/);", "2000");
+  }
+~~~~~~~~    
+
+becomes: 
+
+~~~~~~~~    
+  private void clickSubMenuItem(String subMenuText) {
+    selenium.click("//div[@class=\"GALD-WOBF\" and .=\"" + 
+            subMenuText + "\"]");
+    selenium.waitForCondition("document.title.match(/" + 
+            subMenuText + "/);", "2000");
+  }
+~~~~~~~~    
+
+This way we use 'raw' JavaScript instead of relying on the selenium object injected into the DOM by Selenium. 
+
+##  12.3 Amend MenuHeading.java 
+
+  * Menus open, 
+  * subMenu items available, but not responsive to clicks immediately 
+  * Additional Sync point required on MenuHeading.java 
+
+    * waitForOpen 
+    * waitForClosed 
+
+Quick fix... `Thread.sleep(2000);` ... boo hiss 
+
+You will need to add Thread.sleep in MenuHeading.java (Can't just increase the timeout on iselementPresent because the element is present) 
+    
+~~~~~~~~    
+  private void waitForOpen() {
+  	try {
+  		selenium.waitForCondition(
+  			"selenium.isElementPresent('xpath=//div[@class=\"GALD-WOBF\" and .=\"" +
+         this.firstMenuItemName + "\"]');",
+  			"2000");
+  		Thread.sleep(2000);
+  	} catch (Exception e) {
+  	}		
+  }
+~~~~~~~~
+
+
+to
+
+~~~~~~~~
+private void waitForClosed() {
+	try {
+		selenium.waitForCondition(
+			"!selenium.isElementPresent('xpath=//div[@class=\"GALD-WOBF\" and .=\"" +
+       this.firstMenuItemName + "\"]');",
+			"2000");
+		Thread.sleep(2000);
+	} catch (Exception e) {
+	}		
+}
+~~~~~~~~    
+
+##  12.4 Completed our initial conversion to Selenium 2 
+
+If we had to, we could stop here. At this point all our tests run, and pass, and they use Selenium 2. 
+
+We haven't used any of the Selenium 2 idoms and haven't used any of the WebDriver functionality, but we have managed to migrate our tests over to Selenium 2 using the emulation layer. 
+
+This is checked in as Revision 9 
