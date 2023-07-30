@@ -6,15 +6,11 @@ Originally Source code for Page Objects and Beyond conf talk and workshops:
 * http://seleniumsimplified.com/2014/11/automation-abstractions-page-objects-and-beyond-conference-talk/
 * http://seleniumsimplified.com/2014/09/selenium-webdriver-page-object-abstractions-and-beyond/
 
-Copyright Compendium Developments Ltd 2014-2019, Licenced under MIT License for personal study
-
-* Commercial licenses may be negotiated if you wish to use this material to train others
-
-[Contact Alan Richardson](https://eviltester.com/contact) if you would like inhouse training for this material https://eviltester.com/contact
+Copyright Compendium Developments Ltd 2014, Licenced under MIT License
 
 ---
 
-[![Build Status](https://travis-ci.org/eviltester/automationAbstractions.svg?branch=master)](https://travis-ci.org/eviltester/automationAbstractions)
+
 
 ---
 
