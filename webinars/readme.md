@@ -20,14 +20,6 @@ Alan Richardson
 www.eviltester.com
 www.compendiumdev.co.uk
 
-
-License
-=======
-You can use this code for your own personal learning and development. Please do not use it to train others. 
-
-And do not use it for commercial purposes.
-
-
 Support
 =======
 No support is provided for this code. It is explained as it is developed in the Webinars. You use it at your own risk. 
