@@ -3,6 +3,7 @@ package com.eviltester.axe;
 import com.deque.html.axecore.results.Results;
 import com.deque.html.axecore.results.Rule;
 import com.deque.html.axecore.selenium.AxeBuilder;
+import com.deque.html.axecore.selenium.AxeReporter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,43 +57,50 @@ public class AccessibilityExampleTest {
     WebDriver driver;
 
     @BeforeEach
-    void initiateDriver(){
+    void initiateDriver() {
         driver = new ChromeDriver();
     }
 
     @Test
-    void expectPageToHaveAccessiblityIssues(){
+    void expectPageToHaveAccessibilityIssues() {
 
         driver.get("https://testpages.eviltester.com/styled/basic-web-page-test.html");
 
-        Results accessibilityScanResults = new AxeBuilder().analyze(driver); // 4
+        Results accessibilityScanResults = new AxeBuilder().analyze(driver);
 
         List<Rule> violations = accessibilityScanResults.getViolations();
 
-        violations.forEach(System.out::println);
+        AxeReporter.getReadableAxeResults("Default", driver, violations);
+        System.out.println(AxeReporter.getAxeResultString());
 
-        assertFalse(accessibilityScanResults.violationFree(), "You have accessibility issues on the page");
+        assertFalse(
+            accessibilityScanResults.violationFree(),
+            "You should have accessibility issues on the page"
+        );
     }
 
     @Test
-    void theMainPartShouldBeFine(){
+    void theMainPartShouldBeFine() {
 
         driver.get("https://testpages.eviltester.com/styled/basic-web-page-test.html");
 
         AxeBuilder filteredAxeScope = new AxeBuilder().include(".page-body");
 
-        Results accessibilityScanResults = filteredAxeScope.analyze(driver); // 4
+        Results accessibilityScanResults = filteredAxeScope.analyze(driver);
 
         List<Rule> violations = accessibilityScanResults.getViolations();
 
-        violations.forEach(System.out::println);
+        AxeReporter.getReadableAxeResults("Default", driver, violations);
+        System.out.println(AxeReporter.getAxeResultString());
 
-        assertTrue(accessibilityScanResults.violationFree(), "You have unexpected accessibility issues due to the page content");
+        assertTrue(
+            accessibilityScanResults.violationFree(),
+            "You have unexpected accessibility issues due to the page content"
+        );
     }
 
     @AfterEach
-    void closeDriver(){
-        driver.close();
+    void closeDriver() {
+        driver.quit();
     }
-
 }
