@@ -27,6 +27,9 @@ public class GovBadPageTest {
 
         https://alphagov.github.io/accessibility-tool-audit/test-cases.html
 
+    There are a lot of test pages on the above site so as an exercise it would
+    be useful to expand the coverage in this test class to the child test pages listed.
+
      */
 
     @Test

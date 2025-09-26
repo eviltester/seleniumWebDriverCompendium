@@ -62,7 +62,7 @@ public class AccessibilityExampleTest {
     }
 
     @Test
-    void expectPageToHaveAccessibilityIssues() {
+    void auditPageAndExpectIssues() {
 
         driver.get("https://testpages.eviltester.com/styled/basic-web-page-test.html");
 
@@ -80,7 +80,7 @@ public class AccessibilityExampleTest {
     }
 
     @Test
-    void theMainPartShouldBeFine() {
+    void limitAuditScopeToSectionOfPageAndExpectNoIssues() {
 
         driver.get("https://testpages.eviltester.com/styled/basic-web-page-test.html");
 
@@ -98,6 +98,38 @@ public class AccessibilityExampleTest {
             "You have unexpected accessibility issues due to the page content"
         );
     }
+
+    @Test
+    void limitWcagScopeToOfPageAndExpectOneIssues() {
+
+        /*
+            The WCAG standard lists a lot of rules.
+
+            https://www.w3.org/TR/WCAG21/#wcag-2-layers-of-guidance
+
+            It is possible to only use certain
+            sections via tags.
+
+            List of supported tags is here:
+
+            https://www.deque.com/axe/core-documentation/api-documentation/#axecore-tags
+         */
+        driver.get("https://testpages.eviltester.com/styled/basic-web-page-test.html");
+
+        AxeBuilder filteredAxeScope = new AxeBuilder().withTags(List.of("wcag2a"));
+
+        Results accessibilityScanResults = filteredAxeScope.analyze(driver);
+
+        List<Rule> violations = accessibilityScanResults.getViolations();
+
+        AxeReporter.getReadableAxeResults("Default", driver, violations);
+        System.out.println(AxeReporter.getAxeResultString());
+
+        assertEquals(1, violations.size(),
+                "You have unexpected accessibility issues due to the page content"
+        );
+    }
+
 
     @AfterEach
     void closeDriver() {
