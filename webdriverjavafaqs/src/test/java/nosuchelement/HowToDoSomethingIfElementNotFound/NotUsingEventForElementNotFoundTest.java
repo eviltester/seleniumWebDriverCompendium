@@ -30,7 +30,7 @@ public class NotUsingEventForElementNotFoundTest {
         WebDriver eventFiringWebDriver = new EventFiringDecorator<>(listener).decorate(driver);
 
 
-        String indexPage = "https://testpages.eviltester.com/styled/index.html";
+        String indexPage = "https://testpages.eviltester.com";
         eventFiringWebDriver.get(indexPage);
 
         Exception e = Assertions.assertThrows(NoSuchElementException.class, () -> {

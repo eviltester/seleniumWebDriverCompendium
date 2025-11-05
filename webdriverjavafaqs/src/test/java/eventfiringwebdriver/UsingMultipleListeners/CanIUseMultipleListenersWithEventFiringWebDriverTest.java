@@ -28,7 +28,7 @@ public class CanIUseMultipleListenersWithEventFiringWebDriverTest {
         eventFiringWebDriver.register(before);
         eventFiringWebDriver.register(after);
 
-        String indexPage = "https://testpages.eviltester.com/styled/index.html";
+        String indexPage = "https://testpages.eviltester.com";
         eventFiringWebDriver.get(indexPage);
         eventFiringWebDriver.findElement(By.id("basicpagetest")).click();
 

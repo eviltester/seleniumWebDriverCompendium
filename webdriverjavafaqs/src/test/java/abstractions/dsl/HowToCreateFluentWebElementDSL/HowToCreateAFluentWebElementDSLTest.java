@@ -21,7 +21,7 @@ public class HowToCreateAFluentWebElementDSLTest {
     @BeforeAll
     public static void setup(){
         driver = new ChromeDriver();
-        driver.get("https://testpages.herokuapp.com/pages/forms/javascript-validation/");
+        driver.get("https://testpages.eviltester.com/pages/forms/javascript-validation/");
     }
 
 

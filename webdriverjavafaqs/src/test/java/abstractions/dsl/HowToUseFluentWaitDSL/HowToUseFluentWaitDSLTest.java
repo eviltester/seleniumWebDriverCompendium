@@ -58,8 +58,7 @@ public class HowToUseFluentWaitDSLTest {
     @Test
     public void aFluentWaitInAction(){
 
-        driver.get("https://testpages.eviltester.com/styled/"+
-                    "javascript-countdown-test.html");
+        driver.get("https://testpages.eviltester.com/apps/countdown-timer/");
 
         By countdown = By.id("javascript_countdown_time");
 

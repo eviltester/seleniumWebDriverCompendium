@@ -18,7 +18,7 @@ public class WhyBrowserNotClosingTest {
 
     @Test
     public void exampleSlowLoadableUsage(){
-        driver.get("https://testpages.eviltester.com/styled/index.html");
+        driver.get("https://testpages.eviltester.com");
     }
 
     @AfterAll

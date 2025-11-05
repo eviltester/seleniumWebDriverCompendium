@@ -27,7 +27,7 @@ public class WhySlowLoadableComponentNotWaitingTest {
 
     @Test
     public void exampleSlowLoadableUsage(){
-        driver.get("https://testpages.eviltester.com/styled/dynamic-buttons-disabled.html");
+        driver.get("https://testpages.eviltester.com/challenges/synchronization/dynamic-buttons-02/");
 
         final DynamicButtonPage page = new DynamicButtonPage(driver);
         page.get();
@@ -61,7 +61,7 @@ public class WhySlowLoadableComponentNotWaitingTest {
 
         @Override
         protected void load() {
-            driver.get("https://testpages.eviltester.com/styled/dynamic-buttons-disabled.html");
+            driver.get("https://testpages.eviltester.com/challenges/synchronization/dynamic-buttons-02/");
         }
 
         @Override

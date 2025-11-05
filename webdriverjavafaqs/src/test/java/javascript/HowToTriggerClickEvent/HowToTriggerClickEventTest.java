@@ -21,7 +21,7 @@ public class HowToTriggerClickEventTest {
 
     @Test
     public void exampleOfClick() {
-        driver.get("https://testpages.eviltester.com/styled/alerts/alert-test.html");
+        driver.get("https://testpages.eviltester.com/pages/basics/alerts-javascript/");
 
         driver.findElement(By.id("alertexamples")).click();
 
@@ -34,7 +34,7 @@ public class HowToTriggerClickEventTest {
 
     @Test
     public void bypassClickUsingJavascriptExecutor() {
-        driver.get("https://testpages.eviltester.com/styled/alerts/alert-test.html");
+        driver.get("https://testpages.eviltester.com/pages/basics/alerts-javascript/");
 
         WebElement element = driver.findElement(By.id("alertexamples"));
         ((JavascriptExecutor)driver).

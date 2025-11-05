@@ -21,7 +21,7 @@ public class HowToTriggerBlurEventTest {
     public void triggerEventUsingJavaScript(){
 
         WebDriver driver = new ChromeDriver();
-        driver.get("https://testpages.eviltester.com/styled/events/javascript-events.html");
+        driver.get("https://testpages.eviltester.com/pages/interaction/javascript-events/");
 
         final WebElement button = driver.findElement(By.id("onblur"));
         final WebElement status = driver.findElement(By.id("onblurstatus"));
@@ -38,7 +38,7 @@ public class HowToTriggerBlurEventTest {
     public void physicalWorkaround(){
 
         WebDriver driver = new ChromeDriver();
-        driver.get("https://testpages.eviltester.com/styled/events/javascript-events.html");
+        driver.get("https://testpages.eviltester.com/pages/interaction/javascript-events/");
 
         final WebElement button = driver.findElement(By.id("onblur"));
         final WebElement status = driver.findElement(By.id("onblurstatus"));

@@ -63,7 +63,7 @@ public class HowToCaptureNetworkTrafficWithHTTPProxyTest {
     @Test
     public void captureTraffic(){
 
-        driver.get("https://testpages.eviltester.com/styled/sync/xhttp-messages.html");
+        driver.get("https://testpages.eviltester.com/challenges/synchronization/xhttp-message-processing/");
 
         // wait for all messages to be sent by the app
         ((JavascriptExecutor)driver).executeAsyncScript(

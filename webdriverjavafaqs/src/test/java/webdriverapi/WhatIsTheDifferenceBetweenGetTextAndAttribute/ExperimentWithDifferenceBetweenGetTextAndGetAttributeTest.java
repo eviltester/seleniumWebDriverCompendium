@@ -27,8 +27,7 @@ public class ExperimentWithDifferenceBetweenGetTextAndGetAttributeTest {
 
     @BeforeEach
     public void getThePageToExperimentWith(){
-        driver.get("https://testpages.eviltester.com/styled/" +
-                "basic-web-page-test.html");
+        driver.get("https://testpages.eviltester.com/pages/basics/basic-web-page/");
     }
 
     @Test

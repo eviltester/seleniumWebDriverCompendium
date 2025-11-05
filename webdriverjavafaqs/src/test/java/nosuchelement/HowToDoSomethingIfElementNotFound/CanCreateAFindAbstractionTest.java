@@ -19,7 +19,7 @@ public class CanCreateAFindAbstractionTest {
     public void aFindElementAbstractionCanHandleExceptions(){
 
         WebDriver driver = new ChromeDriver();
-        driver.get("https://testpages.eviltester.com/styled/index.html");
+        driver.get("https://testpages.eviltester.com");
 
         ElementFinder finder = new ElementFinder(driver);
 

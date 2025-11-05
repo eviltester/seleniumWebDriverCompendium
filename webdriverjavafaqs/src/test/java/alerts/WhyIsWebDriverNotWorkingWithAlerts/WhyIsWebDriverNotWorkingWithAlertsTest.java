@@ -25,8 +25,7 @@ public class WhyIsWebDriverNotWorkingWithAlertsTest {
 
     @Test
     public void webdriverHandlesAlerts(){
-        driver.get("https://testpages.eviltester.com/styled/" +
-                    "alerts/alert-test.html");
+        driver.get("https://testpages.eviltester.com/pages/basics/alerts-javascript/");
         driver.findElement(By.id("alertexamples")).click();
         driver.switchTo().alert().dismiss();
 
@@ -37,8 +36,7 @@ public class WhyIsWebDriverNotWorkingWithAlertsTest {
 
     @Test
     public void aDivIsNotAnAlertToHandle(){
-        driver.get("https://testpages.eviltester.com/styled/alerts/" +
-                    "fake-alert-test.html");
+        driver.get("https://testpages.eviltester.com/pages/basics/alerts-not-javascript/");
         driver.findElement(By.id("fakealert")).click();
 
         new WebDriverWait(driver, Duration.ofSeconds(10)).until(
