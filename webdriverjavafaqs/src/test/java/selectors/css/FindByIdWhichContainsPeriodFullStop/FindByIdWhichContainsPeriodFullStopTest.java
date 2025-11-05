@@ -1,6 +1,6 @@
 package selectors.css.FindByIdWhichContainsPeriodFullStop;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,15 +17,14 @@ public class FindByIdWhichContainsPeriodFullStopTest {
 
     @BeforeAll
     public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
     }
 
     @Test
     public void cssWithoutEscapingFails(){
 
-        driver.get("https://testpages.herokuapp.com/styled/" +
-                "challenges/hard-selectors.html");
+        driver.get("https://testpages.eviltester.com/" +
+                "challenges/locators/hard-selectors/");
 
         Assertions.assertThrows(NoSuchElementException.class, () ->
             driver.findElement(By.cssSelector("#select.me.by.id")));
@@ -34,15 +33,15 @@ public class FindByIdWhichContainsPeriodFullStopTest {
     @Test
     public void cssEscapingExample(){
 
-        driver.get("https://testpages.herokuapp.com/styled/" +
-                    "challenges/hard-selectors.html");
+        driver.get("https://testpages.eviltester.com/" +
+                "challenges/locators/hard-selectors/");
 
         String goodSelector = "#select\\.me\\.by\\.id";
         final WebElement button = driver.findElement(
                                 By.cssSelector(goodSelector));
         button.click();
 
-        Assertions.assertEquals("Event Triggered",
+        Assertions.assertEquals("Click Event Triggered",
                 driver.findElement(By.cssSelector(goodSelector + "status")).
                         getText());
     }
@@ -50,15 +49,15 @@ public class FindByIdWhichContainsPeriodFullStopTest {
     @Test
     public void orJustUseById(){
 
-        driver.get("https://testpages.herokuapp.com/styled/" +
-                "challenges/hard-selectors.html");
+        driver.get("https://testpages.eviltester.com/" +
+                "challenges/locators/hard-selectors/");
 
         String goodSelector = "select.me.by.id";
         final WebElement button = driver.findElement(
                 By.id(goodSelector));
         button.click();
 
-        Assertions.assertEquals("Event Triggered",
+        Assertions.assertEquals("Click Event Triggered",
                 driver.findElement(By.id(goodSelector + "status")).
                         getText());
     }
@@ -66,15 +65,15 @@ public class FindByIdWhichContainsPeriodFullStopTest {
     @Test
     public void orUseXPath(){
 
-        driver.get("https://testpages.herokuapp.com/styled/" +
-                "challenges/hard-selectors.html");
+        driver.get("https://testpages.eviltester.com/" +
+                "challenges/locators/hard-selectors/");
 
         String goodSelector = "//button[@id='select.me.by.id']";
         final WebElement button = driver.findElement(
                 By.xpath(goodSelector));
         button.click();
 
-        Assertions.assertEquals("Event Triggered",
+        Assertions.assertEquals("Click Event Triggered",
                 driver.findElement(
                         By.xpath("//p[@id='select.me.by.idstatus']")).
                         getText());

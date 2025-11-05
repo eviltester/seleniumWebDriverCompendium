@@ -1,6 +1,6 @@
 package javascript.HowToTriggerBlurEvent;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -16,17 +16,12 @@ public class HowToTriggerBlurEventTest {
         How can we replicate this functionality in WebDriver to
         trigger blur events?.
      */
-
-    @BeforeAll
-    public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
-    }
-
+    
     @Test
     public void triggerEventUsingJavaScript(){
 
         WebDriver driver = new ChromeDriver();
-        driver.get("https://testpages.herokuapp.com/styled/events/javascript-events.html");
+        driver.get("https://testpages.eviltester.com/styled/events/javascript-events.html");
 
         final WebElement button = driver.findElement(By.id("onblur"));
         final WebElement status = driver.findElement(By.id("onblurstatus"));
@@ -43,7 +38,7 @@ public class HowToTriggerBlurEventTest {
     public void physicalWorkaround(){
 
         WebDriver driver = new ChromeDriver();
-        driver.get("https://testpages.herokuapp.com/styled/events/javascript-events.html");
+        driver.get("https://testpages.eviltester.com/styled/events/javascript-events.html");
 
         final WebElement button = driver.findElement(By.id("onblur"));
         final WebElement status = driver.findElement(By.id("onblurstatus"));

@@ -1,6 +1,6 @@
 package observability.HowToHighlightElementsBeingUsed;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -20,11 +21,7 @@ public class HowToHighlightElementsBeingUsedTest {
         were being used. How can we replicate this functionality in WebDriver to
         see which elements are being used.
      */
-
-    @BeforeAll
-    public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
-    }
+    
 
     @Test
     public void simpleHighlightWithDirectClass(){
@@ -36,10 +33,10 @@ public class HowToHighlightElementsBeingUsedTest {
 
         //driver = new ChromeDriver();
 
-        driver.get("https://testpages.herokuapp.com/styled/index.html");
+        driver.get("https://testpages.eviltester.com/pages/forms/");
 
         // fill in a form
-        highlighter.highlight(driver.findElement(By.id("htmlformtest"))).click();
+        highlighter.highlight(driver.findElement(By.cssSelector("a[href='/pages/forms/html-form/'"))).click();
         pauseToAllowVisibility();
 
         highlighter.highlight(driver.findElement(By.name("username"))).sendKeys("Bob");
@@ -53,10 +50,11 @@ public class HowToHighlightElementsBeingUsedTest {
         final WebElement button = highlighter.highlight(
                                     driver.findElements(By.name("submitbutton")).get(1));
         pauseToAllowVisibility();
+        new Actions(driver).moveToElement(button).perform();
         button.click();
 
         Assertions.assertEquals("Bob",
-                new WebDriverWait(driver, 10).
+                new WebDriverWait(driver, Duration.ofSeconds(10)).
                         until(ExpectedConditions.elementToBeClickable(
                                 By.id("_valueusername"))).getText());
 
@@ -69,10 +67,10 @@ public class HowToHighlightElementsBeingUsedTest {
         WebDriver driver = new ElementHighlighter(new ChromeDriver(), "yellow").getWrappedDriver();
         //driver = new ChromeDriver();
 
-        driver.get("https://testpages.herokuapp.com/styled/index.html");
+        driver.get("https://testpages.eviltester.com/pages/forms/");
 
         // fill in a form
-        driver.findElement(By.id("htmlformtest")).click();
+        driver.findElement(By.cssSelector("a[href='/pages/forms/html-form/'")).click();
         pauseToAllowVisibility();
 
         driver.findElement(By.name("username")).sendKeys("Bob");
@@ -85,10 +83,11 @@ public class HowToHighlightElementsBeingUsedTest {
 
         final WebElement button = driver.findElements(By.name("submitbutton")).get(1);
         pauseToAllowVisibility();
+        new Actions(driver).moveToElement(button).perform();
         button.click();
 
         Assertions.assertEquals("Bob",
-                new WebDriverWait(driver,10).
+                new WebDriverWait(driver,Duration.ofSeconds(10)).
                         until(ExpectedConditions.elementToBeClickable(
                                 By.id("_valueusername"))).getText());
 

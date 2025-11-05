@@ -12,7 +12,7 @@ public class Calculator {
 
     public Calculator(WebDriver driver) {
         this.driver = driver;
-        driver.navigate().to("https://testpages.herokuapp.com/styled/calculator");
+        driver.navigate().to("https://testpages.eviltester.com/apps/server-side-calculator/");
 
         operatorToFunction = new HashMap<String, String>();
         operatorToFunction.put("+", "plus");

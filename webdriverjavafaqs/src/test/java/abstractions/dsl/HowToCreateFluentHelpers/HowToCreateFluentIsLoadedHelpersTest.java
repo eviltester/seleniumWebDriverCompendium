@@ -1,6 +1,5 @@
 package abstractions.dsl.HowToCreateFluentHelpers;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,6 +12,7 @@ import org.openqa.selenium.support.ui.SlowLoadableComponent;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Clock;
+import java.time.Duration;
 
 public class HowToCreateFluentIsLoadedHelpersTest {
 
@@ -20,19 +20,18 @@ public class HowToCreateFluentIsLoadedHelpersTest {
 
     @BeforeAll
     public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
     }
 
     @Test
     public void exampleSlowLoadableUsage(){
-        driver.get("https://testpages.herokuapp.com/styled/dynamic-buttons-disabled.html");
+        driver.get("https://testpages.eviltester.com/challenges/synchronization/dynamic-buttons-02/");
 
         final DynamicButtonPage page = new DynamicButtonPage(driver);
         page.get();
         page.clickStart();
 
-        new WebDriverWait(driver, 10).until(
+        new WebDriverWait(driver, Duration.ofSeconds(10)).until(
                 ExpectedConditions.elementToBeClickable(By.id("button01"))
         );
 
@@ -54,13 +53,13 @@ public class HowToCreateFluentIsLoadedHelpersTest {
         private final WebDriver driver;
 
         public DynamicButtonPage(final WebDriver driver) {
-            super(Clock.systemDefaultZone(), 10);
+            super(Clock.systemDefaultZone(), Duration.ofSeconds(10));
             this.driver = driver;
         }
 
         @Override
         protected void load() {
-            driver.get("https://testpages.herokuapp.com/styled/dynamic-buttons-disabled.html");
+            driver.get("https://testpages.eviltester.com/challenges/synchronization/dynamic-buttons-02/");
         }
 
         // Instead of ...

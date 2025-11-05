@@ -3,17 +3,18 @@ package users.simulating.HowToSimulateUserDelay.withEventFiringWebDriver;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
-import org.openqa.selenium.support.events.AbstractWebDriverEventListener;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.decorators.WebDriverDecorator;
+import org.openqa.selenium.support.events.EventFiringDecorator;
+import org.openqa.selenium.support.events.WebDriverListener;
 
 import java.util.Random;
 
 public class UserActionDelay implements WrapsDriver {
-    EventFiringWebDriver driver;
+    WebDriver driver;
 
     public UserActionDelay(final WebDriver aDriver, final int shortestWait, final int maximumWait) {
-        driver = new EventFiringWebDriver(aDriver);
-        driver.register(new UserDelaysEvents(shortestWait, maximumWait));
+        UserDelaysEvents listener = new UserDelaysEvents(shortestWait, maximumWait);
+        driver = new EventFiringDecorator<>(listener).decorate(aDriver);
     }
 
     @Override
@@ -21,7 +22,7 @@ public class UserActionDelay implements WrapsDriver {
         return driver;
     }
 
-    private class UserDelaysEvents extends AbstractWebDriverEventListener {
+    public class UserDelaysEvents implements WebDriverListener {
         private final int shortestWait;
         private final int longestWait;
 
@@ -31,15 +32,13 @@ public class UserActionDelay implements WrapsDriver {
         }
 
         @Override
-        public void beforeClickOn(final WebElement element, final WebDriver driver) {
+        public void beforeClick(final WebElement element) {
             userWaitsForSomeTime();
-            super.beforeClickOn(element, driver);
         }
 
         @Override
-        public void beforeChangeValueOf(final WebElement element, final WebDriver driver, final CharSequence[] keysToSend) {
+        public void beforeSendKeys(final WebElement element, final CharSequence[] keysToSend) {
             userWaitsForSomeTime();
-            super.beforeChangeValueOf(element, driver, keysToSend);
         }
 
         private void userWaitsForSomeTime() {

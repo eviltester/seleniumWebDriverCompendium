@@ -1,6 +1,5 @@
 package abstractions.driver.HowToCreateADriverManager;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -11,7 +10,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
@@ -42,9 +40,6 @@ public class Driver extends Thread{
     public static String PROXY=PROXYHOST+":"+PROXYPORT;
 
     public static WebDriver get() {
-
-        WebDriverManager.chromedriver().setup();
-        WebDriverManager.firefoxdriver().setup();
 
         if(useThisDriver == null){
 

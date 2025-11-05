@@ -1,6 +1,6 @@
 package abstractions.pageobjects.AnySimpleExamplesOfPageObjectsAndAbstractions;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,14 +15,13 @@ public class SimpleModelUsingPageObjectModelTest {
 
     @BeforeAll
     static void startupBrowser(){
-        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
     }
 
     @Test
     public void canAddTwoNumbers(){
 
-        driver.navigate().to("https://testpages.herokuapp.com/styled/calculator");
+        driver.navigate().to("https://testpages.eviltester.com/apps/server-side-calculator/");
 
         CalculatorPage calculatorPage = new CalculatorPage(driver);
 
@@ -38,7 +37,7 @@ public class SimpleModelUsingPageObjectModelTest {
     @Test
     public void canAddTwoNumbersLiterately(){
 
-        driver.navigate().to("http://compendiumdev.co.uk/selenium/calculate.php");
+        driver.navigate().to("https://testpages.eviltester.com/apps/server-side-calculator/");
 
         CalculatorPage calculatorPage = new CalculatorPage(driver);
 

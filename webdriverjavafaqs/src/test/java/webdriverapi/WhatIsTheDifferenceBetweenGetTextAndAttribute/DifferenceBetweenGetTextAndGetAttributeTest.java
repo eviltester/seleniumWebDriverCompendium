@@ -1,6 +1,6 @@
 package webdriverapi.WhatIsTheDifferenceBetweenGetTextAndAttribute;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -13,15 +13,13 @@ public class DifferenceBetweenGetTextAndGetAttributeTest {
 
     @BeforeAll
     public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
     }
 
     @BeforeEach
 
     public void getThePage(){
-        driver.get("https://testpages.herokuapp.com/styled/" +
-                "basic-web-page-test.html");
+        driver.get("https://testpages.eviltester.com/pages/basics/basic-web-page/");
 
         // e.g <p id="para1" class="main">A paragraph of text</p>
     }
@@ -54,7 +52,7 @@ public class DifferenceBetweenGetTextAndGetAttributeTest {
         // page title is "Basic Web Page Title"
         // but can't use getText on <title>
         Assertions.assertNotEquals(
-                "Basic Web Page Title",
+                "Basic Web Page | Test Pages",
                             title.getText());
 
         Assertions.assertEquals("", title.getText());
@@ -66,7 +64,7 @@ public class DifferenceBetweenGetTextAndGetAttributeTest {
         WebElement title = driver.findElement(By.tagName("title"));
 
         Assertions.assertEquals(
-                "Basic Web Page Title",
+                "Basic Web Page | Test Pages",
                 title.getAttribute("text"));
     }
 

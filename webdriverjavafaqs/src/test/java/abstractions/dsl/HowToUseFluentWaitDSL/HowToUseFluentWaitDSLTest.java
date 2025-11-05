@@ -1,6 +1,6 @@
 package abstractions.dsl.HowToUseFluentWaitDSL;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -19,51 +19,52 @@ public class HowToUseFluentWaitDSLTest {
 
     @BeforeAll
     public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
     }
 
     @Test
     public void aBasicWait() {
 
-        driver.get("https://testpages.herokuapp.com/styled/index.html");
+        driver.get("https://testpages.eviltester.com/pages/forms/");
 
         // selenium 3
-        WebDriverWait wait = new WebDriverWait(driver, 10);
+        // WebDriverWait wait = new WebDriverWait(driver, 10);
         // selenium 4
-        // WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.elementToBeClickable(
-                By.id("htmlformtest")));
-        driver.findElement(By.id("htmlformtest")).click();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        Assertions.assertEquals("HTML Form Elements",
+        wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("a[href='/pages/forms/html-form/']")));
+
+        driver.findElement(By.cssSelector("a[href='/pages/forms/html-form/']")).click();
+
+        Assertions.assertEquals("HTML Form | Test Pages",
                             driver.getTitle());
     }
 
     @Test
     public void aBasicWaitIsFluent() {
 
-        driver.get("https://testpages.herokuapp.com/styled/index.html");
+        driver.get("https://testpages.eviltester.com/pages/forms/");
 
-        new WebDriverWait(driver, 10)
+        new WebDriverWait(driver, Duration.ofSeconds(10))
             .until(ExpectedConditions.elementToBeClickable(
-                By.id("htmlformtest")))
+                    By.cssSelector("a[href='/pages/forms/html-form/']")))
                 .click();
 
-        Assertions.assertEquals("HTML Form Elements",
+        Assertions.assertEquals("HTML Form | Test Pages",
                 driver.getTitle());
     }
 
     @Test
     public void aFluentWaitInAction(){
 
-        driver.get("https://testpages.herokuapp.com/styled/"+
+        driver.get("https://testpages.eviltester.com/styled/"+
                     "javascript-countdown-test.html");
 
         By countdown = By.id("javascript_countdown_time");
 
         // create a basic default wait
-        WebDriverWait wait = new WebDriverWait(driver,10);
+        WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(10));
 
         // wait till countdown exists on screen
         wait.until( ExpectedConditions.

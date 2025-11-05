@@ -1,6 +1,6 @@
 package alerts.WhyIsWebDriverNotWorkingWithAlerts;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,19 +12,20 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
+
 public class WhyIsWebDriverNotWorkingWithAlertsTest {
 
     private static WebDriver driver;
 
     @BeforeAll
     public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
     }
 
     @Test
     public void webdriverHandlesAlerts(){
-        driver.get("https://testpages.herokuapp.com/styled/" +
+        driver.get("https://testpages.eviltester.com/styled/" +
                     "alerts/alert-test.html");
         driver.findElement(By.id("alertexamples")).click();
         driver.switchTo().alert().dismiss();
@@ -36,11 +37,11 @@ public class WhyIsWebDriverNotWorkingWithAlertsTest {
 
     @Test
     public void aDivIsNotAnAlertToHandle(){
-        driver.get("https://testpages.herokuapp.com/styled/alerts/" +
+        driver.get("https://testpages.eviltester.com/styled/alerts/" +
                     "fake-alert-test.html");
         driver.findElement(By.id("fakealert")).click();
 
-        new WebDriverWait(driver, 10).until(
+        new WebDriverWait(driver, Duration.ofSeconds(10)).until(
                 ExpectedConditions.visibilityOfElementLocated(By.id("dialog")));
 
         // the div is not an alert
@@ -51,7 +52,7 @@ public class WhyIsWebDriverNotWorkingWithAlertsTest {
         driver.findElement(By.id("dialog-ok")).click();
 
         // wait till it goes away
-        new WebDriverWait(driver, 10).until(
+        new WebDriverWait(driver, Duration.ofSeconds(10)).until(
                 ExpectedConditions.not(
                         ExpectedConditions.
                                 visibilityOfElementLocated(

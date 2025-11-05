@@ -1,7 +1,6 @@
 package abstractions.dsl.HowToCreateFluentWebElementDSL;
 
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -10,7 +9,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 
 public class HowToCreateAFluentWebElementDSLTest {
 
@@ -18,34 +20,53 @@ public class HowToCreateAFluentWebElementDSLTest {
 
     @BeforeAll
     public static void setup(){
-        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
-        driver.get("https://testpages.herokuapp.com/styled/search");
+        driver.get("https://testpages.herokuapp.com/pages/forms/javascript-validation/");
     }
 
 
     @Test
     public void whatIfWeHadAFluentWebElementForSearchPage(){
 
-        FluentWebElement searchBox = new FluentWebElement(driver.findElement(By.name("q")));
+        FluentWebElement value1 = new FluentWebElement(driver.findElement(By.id("lteq30a")));
+        FluentWebElement value2 = new FluentWebElement(driver.findElement(By.id("lteq30b")));
 
-        searchBox.clear().then().
-                sendKeys("Fluent Programming").and().submit();
+        value1.clear().then().sendKeys("22");
 
-        Assertions.assertTrue(
-                driver.getTitle().contains("Fluent Programming"));
+        value2.clear().then().sendKeys("21").and().submit();
+
+        new WebDriverWait(driver, Duration.ofSeconds(10)).
+            until(ExpectedConditions.not(
+                ExpectedConditions.textToBe(By.id("_valuevalue1"), "")));
+
+        Assertions.assertEquals("22",
+                driver.findElement(By.id("_valuevalue1")).getText());
+        Assertions.assertEquals("21",
+                driver.findElement(By.id("_valuevalue2")).getText());
+
     }
 
     @Test
     public void whatIfWeDidNotHaveAFluentWebElementForSearchPage(){
 
-        WebElement searchBox = driver.findElement(By.name("q"));
+        WebElement value1 = driver.findElement(By.id("lteq30a"));
+        WebElement value2 = driver.findElement(By.id("lteq30b"));
 
-        searchBox.clear();
-        searchBox.sendKeys("Normal Programming");
-        searchBox.submit();
+        value1.clear();
+        value1.sendKeys("22");
 
-        Assertions.assertTrue(driver.getTitle().contains("Normal Programming"));
+        value2.clear();
+        value2.sendKeys("21");
+        value2.submit();
+
+        new WebDriverWait(driver, Duration.ofSeconds(10)).
+                until(ExpectedConditions.not(
+                        ExpectedConditions.textToBe(By.id("_valuevalue1"), "")));
+
+        Assertions.assertEquals("22",
+                driver.findElement(By.id("_valuevalue1")).getText());
+        Assertions.assertEquals("21",
+                driver.findElement(By.id("_valuevalue2")).getText());
     }
 
     @AfterAll

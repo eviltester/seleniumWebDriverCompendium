@@ -1,15 +1,18 @@
 package synchronisation.ShouldIUseAWaitInsteadOfAnAssertion;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 public class ShouldIUseWaitOrAssertionTest {
 
@@ -17,37 +20,36 @@ public class ShouldIUseWaitOrAssertionTest {
 
     @BeforeAll
     public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
     }
 
     @Test
     public void ifIWasTestingForPageTitle() {
 
-        driver.get("https://testpages.herokuapp.com/styled/index.html");
+        driver.get("https://testpages.eviltester.com/pages/forms/");
 
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        wait.until(ExpectedConditions.elementToBeClickable(
-                By.id("htmlformtest")));
-        driver.findElement(By.id("htmlformtest")).click();
+        WebDriverWait wait = new WebDriverWait(driver,  Duration.ofSeconds(10));
+        WebElement link = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("a[href='/pages/forms/html-form/']")));
+        link.click();
 
         // wait.until(ExpectedConditions.titleIs("HTML Form Elements"));
 
-        Assertions.assertEquals("HTML Form Elements",
+        Assertions.assertEquals("HTML Form | Test Pages",
                 driver.getTitle());
     }
 
     @Test
     public void ifIWasEnsuringIWasOnTheCorrectPageBeforeTesting() {
 
-        driver.get("https://testpages.herokuapp.com/styled/index.html");
+        driver.get("https://testpages.eviltester.com/pages/forms/");
 
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        wait.until(ExpectedConditions.elementToBeClickable(
-                By.id("htmlformtest")));
-        driver.findElement(By.id("htmlformtest")).click();
+        WebDriverWait wait = new WebDriverWait(driver,  Duration.ofSeconds(10));
+        WebElement link = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("a[href='/pages/forms/html-form/']")));
+        link.click();
 
-        wait.until(ExpectedConditions.titleIs("HTML Form Elements"));
+        wait.until(ExpectedConditions.titleIs("HTML Form | Test Pages"));
 
         Assertions.assertEquals("cancel",
                 driver.findElement(By.name("submitbutton")).
@@ -57,14 +59,14 @@ public class ShouldIUseWaitOrAssertionTest {
     @Test
     public void ifIHadToWaitForPageTitle() {
 
-        driver.get("https://testpages.herokuapp.com/styled/index.html");
+        driver.get("https://testpages.eviltester.com/pages/forms/");
 
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        wait.until(ExpectedConditions.elementToBeClickable(
-                By.id("htmlformtest")));
-        driver.findElement(By.id("htmlformtest")).click();
+        WebDriverWait wait = new WebDriverWait(driver,  Duration.ofSeconds(10));
+        WebElement link = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("a[href='/pages/forms/html-form/']")));
+        link.click();
 
-        String pageTitle = "HTML Form Elements";
+        String pageTitle = "HTML Form | Test Pages";
         wait.until(ExpectedConditions.titleIs(pageTitle));
 
         // wait will already have failed, but the condition

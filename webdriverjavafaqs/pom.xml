@@ -9,25 +9,26 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <junit.jupiter.version>5.6.2</junit.jupiter.version>
+        <junit.jupiter.version>5.14.1</junit.jupiter.version>
         <!-- configure the compiler plugin via properties rather than plugin -->
         <!-- https://maven.apache.org/plugins/maven-compiler-plugin/examples/set-compiler-source-and-target.html -->
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
 
         <!-- to generate html junit reports for test phase -->
         <maven-site-plugin.version>3.7.1</maven-site-plugin.version>
-        <maven.surefire.report.version>3.0.0-M4</maven.surefire.report.version>
+        <maven.surefire.report.version>3.5.4</maven.surefire.report.version>
 
         <!-- selenium dependencies -->
-        <webdrivermanager.version>4.0.0</webdrivermanager.version>
+        <!-- no need for this any more as it is built into webdriver -->
+        <!-- <webdrivermanager.version>4.0.0</webdrivermanager.version> -->
 
         <!-- periodically check v4 compatibility -->
         <!--
             <selenium-java.version>4.0.0-alpha-6</selenium-java.version>
         -->
         <!-- -->
-        <selenium-java.version>3.141.59</selenium-java.version>
+        <selenium-java.version>4.36.0</selenium-java.version>
 
     </properties>
 
@@ -46,12 +47,15 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- no longer needed as webdriver downloads its own driver dependencies -->
+        <!--
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
             <version>${webdrivermanager.version}</version>
             <scope>test</scope>
         </dependency>
+        -->
 
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -60,12 +64,16 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- selenium-java should bring in all the dependencies we need -->
+        <!-- https://www.selenium.dev/documentation/webdriver/getting_started/install_library/ -->
+        <!--
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-support</artifactId>
             <version>${selenium-java.version}</version>
             <scope>test</scope>
         </dependency>
+        -->
 
         <dependency>
             <groupId>net.lightbody.bmp</groupId>
@@ -84,7 +92,7 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
                 <version>${maven.surefire.report.version}</version>
             </plugin>
         </plugins>

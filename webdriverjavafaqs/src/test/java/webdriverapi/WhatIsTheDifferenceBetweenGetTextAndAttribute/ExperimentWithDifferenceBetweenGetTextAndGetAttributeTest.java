@@ -1,6 +1,6 @@
 package webdriverapi.WhatIsTheDifferenceBetweenGetTextAndAttribute;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,13 +22,12 @@ public class ExperimentWithDifferenceBetweenGetTextAndGetAttributeTest {
 
     @BeforeAll
     public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
     }
 
     @BeforeEach
     public void getThePageToExperimentWith(){
-        driver.get("https://testpages.herokuapp.com/styled/" +
+        driver.get("https://testpages.eviltester.com/styled/" +
                 "basic-web-page-test.html");
     }
 

@@ -1,34 +1,25 @@
 package nosuchelement.HowToDoSomethingIfElementNotFound;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.events.AbstractWebDriverEventListener;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class CanCreateAFindAbstractionTest {
 
     /* we can create an abstraction for 'finding' stuff and if not found
        then do something e.g. take a screenshot */
-
-    @BeforeAll
-    public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
-    }
+    
 
     @Test
     public void aFindElementAbstractionCanHandleExceptions(){
 
         WebDriver driver = new ChromeDriver();
-        driver.get("https://testpages.herokuapp.com/styled/index.html");
+        driver.get("https://testpages.eviltester.com/styled/index.html");
 
         ElementFinder finder = new ElementFinder(driver);
 

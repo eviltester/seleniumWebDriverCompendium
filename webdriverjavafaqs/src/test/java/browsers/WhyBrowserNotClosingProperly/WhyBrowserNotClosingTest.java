@@ -1,6 +1,6 @@
 package browsers.WhyBrowserNotClosingProperly;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,13 +13,12 @@ public class WhyBrowserNotClosingTest {
 
     @BeforeAll
     public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
     }
 
     @Test
     public void exampleSlowLoadableUsage(){
-        driver.get("https://testpages.herokuapp.com/styled/index.html");
+        driver.get("https://testpages.eviltester.com/styled/index.html");
     }
 
     @AfterAll

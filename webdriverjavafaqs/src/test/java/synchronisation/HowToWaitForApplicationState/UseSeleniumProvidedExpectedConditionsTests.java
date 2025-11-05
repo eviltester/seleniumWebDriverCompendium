@@ -9,6 +9,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
+
 // this test originally from https://github.com/eviltester/webDriverExperiments
 public class UseSeleniumProvidedExpectedConditionsTests {
 
@@ -21,21 +23,21 @@ public class UseSeleniumProvidedExpectedConditionsTests {
 
     @Test
     public void useInBuiltExpectedConditions(){
-        driver.get("https://testpages.herokuapp.com/styled/calculator");
-        new WebDriverWait(driver,10).until(ExpectedConditions.titleContains("Selenium"));
+        driver.get("https://testpages.eviltester.com/apps/server-side-calculator/");
+        new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.titleContains("Server"));
     }
 
     @Test
     public void withoutUsingInBuildExpectedConditions(){
-        driver.get("https://testpages.herokuapp.com/styled/calculator");
-        new WebDriverWait(driver,10).
-                until(new TitleContainsCondition("Selenium"));
+        driver.get("https://testpages.eviltester.com/apps/server-side-calculator/");
+        new WebDriverWait(driver, Duration.ofSeconds(10)).
+                until(new TitleContainsCondition("Server"));
     }
 
     @Test
     public void withoutUsingInBuildExpectedConditionsAndFactory(){
-        driver.get("https://testpages.herokuapp.com/styled/calculator");
-        new WebDriverWait(driver,10).until(WaitFor.titleContainsCondition("Selenium"));
+        driver.get("https://testpages.eviltester.com/apps/server-side-calculator/");
+        new WebDriverWait(driver, Duration.ofSeconds(10)).until(WaitFor.titleContainsCondition("Server"));
     }
 
     @AfterAll

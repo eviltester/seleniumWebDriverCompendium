@@ -12,7 +12,7 @@ public class HowToCreateADriverManagerTest {
         System.setProperty(Driver.BROWSER_PROPERTY_NAME, "CHROME");
         WebDriver driver = Driver.get();
 
-        driver.get("https://testpages.herokuapp.com/styled/basic-web-page-test.html");
+        driver.get("https://testpages.eviltester.com/pages/basics/basic-web-page/");
         Assertions.assertEquals("A paragraph of text",
                             driver.findElement(By.id("para1")).getText());
     }
@@ -22,7 +22,7 @@ public class HowToCreateADriverManagerTest {
         System.setProperty(Driver.BROWSER_PROPERTY_NAME, "FIREFOX");
         WebDriver driver = Driver.get();
 
-        driver.get("https://testpages.herokuapp.com/styled/basic-web-page-test.html");
+        driver.get("https://testpages.eviltester.com/pages/basics/basic-web-page/");
         Assertions.assertEquals("A paragraph of text",
                 driver.findElement(By.id("para1")).getText());
     }
@@ -34,7 +34,7 @@ public class HowToCreateADriverManagerTest {
 
         WebDriver driver = Driver.get();
 
-        driver.get("https://testpages.herokuapp.com/styled/basic-web-page-test.html");
+        driver.get("https://testpages.eviltester.com/pages/basics/basic-web-page/");
         Assertions.assertEquals("A paragraph of text",
                 driver.findElement(By.id("para1")).getText());
     }
@@ -45,7 +45,7 @@ public class HowToCreateADriverManagerTest {
         System.setProperty("WEBDRIVER_HEADLESS_BROWSER", "true");
         WebDriver driver = Driver.get();
 
-        driver.get("https://testpages.herokuapp.com/styled/basic-web-page-test.html");
+        driver.get("https://testpages.eviltester.com/pages/basics/basic-web-page/");
         Assertions.assertEquals("A paragraph of text",
                 driver.findElement(By.id("para1")).getText());
     }

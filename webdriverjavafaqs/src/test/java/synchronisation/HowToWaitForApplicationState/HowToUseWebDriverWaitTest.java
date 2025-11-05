@@ -1,6 +1,6 @@
 package synchronisation.HowToWaitForApplicationState;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import observability.HowToHighlightElementsBeingUsed.ElementHighlighter;
 import observability.HowToHighlightElementsBeingUsed.HighlightElement;
 import org.junit.jupiter.api.Assertions;
@@ -15,27 +15,24 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 public class HowToUseWebDriverWaitTest {
 
-
-    @BeforeAll
-    public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
-    }
 
     @Test
     public void canWaitForExpectedConditions(){
 
         WebDriver driver = new ChromeDriver();
 
-        driver.get("https://testpages.herokuapp.com/styled/index.html");
+        driver.get("https://testpages.eviltester.com/pages/forms/");
 
-        WebDriverWait wait = new WebDriverWait(driver, 10);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("htmlformtest")));
-        driver.findElement(By.id("htmlformtest")).click();
+        By formLink = By.cssSelector("a[href='/pages/forms/html-form/']");
+        wait.until(ExpectedConditions.elementToBeClickable(formLink));
+        driver.findElement(formLink).click();
 
         pauseToAllowVisibility();
 

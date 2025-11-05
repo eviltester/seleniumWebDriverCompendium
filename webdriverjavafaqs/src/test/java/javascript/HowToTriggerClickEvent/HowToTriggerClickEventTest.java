@@ -1,6 +1,6 @@
 package javascript.HowToTriggerClickEvent;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -16,13 +16,12 @@ public class HowToTriggerClickEventTest {
 
     @BeforeAll
     public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
     }
 
     @Test
     public void exampleOfClick() {
-        driver.get("https://testpages.herokuapp.com/styled/alerts/alert-test.html");
+        driver.get("https://testpages.eviltester.com/styled/alerts/alert-test.html");
 
         driver.findElement(By.id("alertexamples")).click();
 
@@ -35,7 +34,7 @@ public class HowToTriggerClickEventTest {
 
     @Test
     public void bypassClickUsingJavascriptExecutor() {
-        driver.get("https://testpages.herokuapp.com/styled/alerts/alert-test.html");
+        driver.get("https://testpages.eviltester.com/styled/alerts/alert-test.html");
 
         WebElement element = driver.findElement(By.id("alertexamples"));
         ((JavascriptExecutor)driver).

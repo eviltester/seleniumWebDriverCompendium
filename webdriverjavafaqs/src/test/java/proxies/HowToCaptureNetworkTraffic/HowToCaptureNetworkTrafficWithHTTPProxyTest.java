@@ -1,6 +1,6 @@
 package proxies.HowToCaptureNetworkTraffic;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
 import net.lightbody.bmp.BrowserMobProxyServer;
 import net.lightbody.bmp.client.ClientUtil;
 import net.lightbody.bmp.core.har.Har;
@@ -26,7 +26,6 @@ public class HowToCaptureNetworkTrafficWithHTTPProxyTest {
 
     @BeforeAll
     public static void setup(){
-        WebDriverManager.chromedriver().setup();
 
         // start the proxy
         proxyServer = new BrowserMobProxyServer();
@@ -64,7 +63,7 @@ public class HowToCaptureNetworkTrafficWithHTTPProxyTest {
     @Test
     public void captureTraffic(){
 
-        driver.get("https://testpages.herokuapp.com/styled/sync/xhttp-messages.html");
+        driver.get("https://testpages.eviltester.com/styled/sync/xhttp-messages.html");
 
         // wait for all messages to be sent by the app
         ((JavascriptExecutor)driver).executeAsyncScript(

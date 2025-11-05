@@ -23,7 +23,7 @@ by using the same framework for multiple
 test objectives and types. Here are some
 examples showing how, using Java,
 JUnit, WebDriver and the simple calculator
-application at https://testpages.herokuapp.com/styled/calculator
+application at https://testpages.eviltester.com/styled/calculator
 
 ## The modelling perspective
 
@@ -38,7 +38,7 @@ public void canAddTwoNumbers(){
  WebDriver driver = new FirefoxDriver();
 
  driver.navigate().to(
-    "https://testpages.herokuapp.com/styled/calculator");
+    "https://testpages.eviltester.com/styled/calculator");
  driver.findElement(By.id("number1")).sendKeys("2");
  driver.findElement(By.id("function")).sendKeys("plus");
  driver.findElement(By.id("number2")).sendKeys("3");
@@ -93,7 +93,7 @@ layout. As shown below:
      WebDriver driver = new FirefoxDriver();
 
      driver.navigate().to(
-        "https://testpages.herokuapp.com/styled/calculator");
+        "https://testpages.eviltester.com/styled/calculator");
 
      CalculatorPage calculatorPage = new CalculatorPage(driver);
 
