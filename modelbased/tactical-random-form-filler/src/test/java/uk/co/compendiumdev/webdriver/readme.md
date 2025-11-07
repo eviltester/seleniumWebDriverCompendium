@@ -25,6 +25,16 @@ The `aTest` models a single path through the application.
 - submit form
 - check input is valid
 
+## Junit Parameterization
+
+With a few minor changes I turned it into a parameterized Junit test which
+generates the data it is going to use first, and feeds it in as an argument provider
+to a single test.
+
+This aids reporting and is easier to see a condition failure.
+
+see ParamModelBasedTest
+
 
 ## Next Steps
 

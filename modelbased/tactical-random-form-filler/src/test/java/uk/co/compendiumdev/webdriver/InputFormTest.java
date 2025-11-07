@@ -1,8 +1,8 @@
 package uk.co.compendiumdev.webdriver;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -11,6 +11,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.*;
 
 public class InputFormTest {
@@ -22,7 +23,7 @@ public class InputFormTest {
     String report="";
     String errorReport = "";
 
-    @Before
+    @BeforeEach
     public void startBrowser(){
         driver = new ChromeDriver();
         random = new Random();
@@ -35,7 +36,7 @@ public class InputFormTest {
         countryPicker = new CountryOptionRandomPicker(driver);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void aTest(){
 
         // there are only about 165 countries in the list
@@ -59,12 +60,12 @@ public class InputFormTest {
         System.out.println(errorReport);
 
         if(errorReport.length()>0){
-            Assert.fail();
+            Assertions.fail();
         }
     }
 
     private void visitForm() {
-        driver.get("https://testpages.herokuapp.com/styled/validation/input-validation.html");
+        driver.get("https://testpages.eviltester.com/apps/client-server-form-validation/");
     }
 
     private void fillFormCorrectly() {
@@ -74,7 +75,7 @@ public class InputFormTest {
 
         while(fieldNames.size()>0){
             String nextFieldToFill = fieldNames.get(
-                                    random.nextInt(fieldNames.size()));
+                    random.nextInt(fieldNames.size()));
             fillFieldWithValidRandomValue(nextFieldToFill);
             fieldNames.remove(nextFieldToFill);
         }
@@ -142,7 +143,7 @@ public class InputFormTest {
 
     private void checkValidInput() {
 
-        new WebDriverWait(driver,10).
+        new WebDriverWait(driver, Duration.ofSeconds(10)).
                 until(ExpectedConditions.
                         presenceOfElementLocated(By.id("valid-input")));
     }
@@ -176,8 +177,8 @@ public class InputFormTest {
         public int getNextRandomCountryIndex() {
             if(unselectedOptions.size()==0){
                 int numberOfOptions = driver.findElement(
-                                            formFields.get("country")).
-                                            findElements(By.tagName("option")).size();
+                                formFields.get("country")).
+                        findElements(By.tagName("option")).size();
                 for(int x = 0; x<numberOfOptions; x++){
                     unselectedOptions.add(x);
                 }
